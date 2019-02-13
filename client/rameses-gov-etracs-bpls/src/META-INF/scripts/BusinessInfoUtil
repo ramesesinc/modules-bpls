@@ -1,0 +1,29 @@
+import com.rameses.rcp.annotations.*
+import com.rameses.rcp.common.*
+import com.rameses.osiris2.client.*
+import com.rameses.osiris2.common.*
+import java.rmi.server.*;
+import com.rameses.util.*;
+
+public class BusinessInfoUtil {
+    
+    def update( def entity, def handler ) {
+        def e = [:];
+        e.putAll( entity );
+        e.orgtype = entity.business.orgtype;    
+        if( !e.appinfos ) e.appinfos = [];
+        if( !entity.appinfos ) entity.appinfos = [];
+
+        def exHandler = { result->
+            handler( result.infos );
+        }
+
+        Modal.show( "bpinfoedit:app", [
+            entity: e,
+            existingInfos: e.appinfos,
+            handler: exHandler
+        ]);
+    }
+
+    
+}

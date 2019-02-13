@@ -1,0 +1,16 @@
+<workunit>
+    <invokers>
+        
+        <invoker type="businessvariable:open" action="open" 
+                 caption="Business Variable" role="MASTER"
+                 target="popup"   />
+        
+        <invoker type="businessvariable:create" action="create" 
+                 caption="Business Variable" role="MASTER"
+                 target="popup" />
+    </invokers>
+    <code class="com.rameses.gov.etracs.bpls.models.BusinessVariableModel" />
+    <pages>
+        <page template="com.rameses.gov.etracs.bpls.views.BusinessVariablePage"/>
+    </pages>
+</workunit>

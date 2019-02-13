@@ -1,0 +1,10 @@
+<workunit schemaName="businessrequirementtype">
+    <invokers>       
+        <invoker type="businessrequirementtype:open" action="open" caption="Business Requirement Type" role="MASTER" target="popup"/>
+        <invoker type="businessrequirementtype:create" action="create" caption="Business Requirement Type" role="MASTER"  target="popup"/>
+    </invokers>
+    <code class="com.rameses.gov.etracs.bpls.models.BusinessRequirementTypeModel" />
+    <pages>
+        <page template="com.rameses.gov.etracs.bpls.views.BusinessRequirementTypePage"/>
+    </pages>
+</workunit>

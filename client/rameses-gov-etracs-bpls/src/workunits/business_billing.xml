@@ -1,0 +1,15 @@
+<workunit>
+    <invokers>
+       <invoker type="business:billing" caption="Business Billing"  action="preview" index="2" target="popup"/>        
+       
+       <invoker type="formActions" caption="Close" action="_close" mnemonic="b" shortcut="ctrl B" /> 
+       <invoker type="formActions" caption="Send SMS" action="sendSMS" target="process"/> 
+    </invokers>
+    
+    <code class="com.rameses.gov.etracs.bpls.models.BusinessBillingModel" />
+    
+    <pages>
+        <page name="preview" template="com.rameses.osiris2.common.ui.ReportPreviewPage" />
+    </pages>
+    
+</workunit>

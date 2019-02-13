@@ -1,0 +1,11 @@
+<workunit schemaName="business_lessor">
+    <invokers>
+        <invoker type="business_lessor:create" caption="New Lessor" role="MASTER" action="create" target="popup"/>
+`        <invoker type="business_lessor:open" caption="View Lessor" role="MASTER" action="open" target="popup"/>
+    </invokers>
+    <code class="com.rameses.gov.etracs.bpls.models.BusinessLessorModel" />
+    <pages>
+        <page template="com.rameses.gov.etracs.bpls.views.BusinessLessorPage"/>
+    </pages>
+    
+</workunit>

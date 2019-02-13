@@ -1,0 +1,12 @@
+import com.rameses.annotations.*; 
+
+class BPLSRenewalService {
+	
+    @Service(value="BusinessOnlineRenewalService", connection="local-etracs")
+    def renewalSvc;
+
+    @ProxyMethod 
+    public def find( param ) {
+    	return renewalSvc.find( param ); 
+    } 
+} 

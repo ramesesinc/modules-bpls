@@ -1,0 +1,18 @@
+<workunit schemaName="business_application_requirement">
+    
+    <invokers>
+        <invoker type="business_application_requirement:open"  formTitle="Application #{query.title}" action="open"/>
+        
+        <!-- buttons -->
+        <invoker type="formActions" caption="Assess" action="assess" visibleWhen="#{ task.state == 'assessment' }" />
+        
+        <invoker type="formActions" caption="Issue Permit/Clearance" action="assess"
+            visibleWhen="#{ task.state == 'release' }" />
+    </invokers>
+    <code class="com.rameses.gov.etracs.bpls.models.BusinessApplicationRequirementModel" />
+    <pages>
+        <page template="com.rameses.gov.etracs.bpls.views.BusinessApplicationRequirementPage"/>
+    </pages>
+    
+    
+</workunit>
