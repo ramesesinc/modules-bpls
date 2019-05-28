@@ -1,11 +1,7 @@
-<schema>
-	
+<schema adapter="bplsdb">
 	<element tablename="business_permit_lob">
-		<field name="objid" primary="true"/>
-		<field name="parentid" required="true"/>
-		<field name="lobid" required="true"/>
-		<field name="name" required="true"/>
-		<field name="txndate" required="true"/>
-	</element>	
-
+		<field name="objid" primary="true" prefix="BPERMLOB"/>
+		<field name="permitid" required="true" />
+		<field name="businesslobid" required="true" />
+	</element>
 </schema>

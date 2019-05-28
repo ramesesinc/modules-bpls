@@ -14,9 +14,26 @@ public class BusinessApplicationWorkflowInterceptor {
 	@Service("DateService")
 	def dateSvc;
 
-	@DataContext("business_application_requirement")
-	def bizReq;
+	@After(pattern="WorkflowTaskService.(signal|start)", eval="#{ args[0].processname == 'business_application' }", index=0)
+	public void afterSignal( def evt ) {
+		def tsk = evt.args[0];
 
+		throw new Exception("after signal. task is " + tsk);
+
+		/*		
+		def appid = o.refid;
+		//check if there are requirements that need to be completed.
+		def list = bizReq.find( [applicationid: appid ] ).where(" type.requiredstate = :state AND (completed IS NULL OR completed=0) ", [state: o.taskstate] ).list()
+		if(list) {
+			def buff = new StringBuffer();
+			def str = list*.type.title.join("\n");
+			throw new Exception("The following requirements are not yet verified \n" + str);
+		}
+		*/	
+	}
+
+
+	/*
 	@Before(pattern="WorkflowTaskService.signal", eval="#{ args[0].processname == 'business_application' }", index=0)
 	public void beforeSignal( def evt ) {
 		def o = evt.args[0];
@@ -60,6 +77,6 @@ public class BusinessApplicationWorkflowInterceptor {
 		def action = o.action;
 		throw new Exception("stop signal")
 	}
-
+	*/
 
 }

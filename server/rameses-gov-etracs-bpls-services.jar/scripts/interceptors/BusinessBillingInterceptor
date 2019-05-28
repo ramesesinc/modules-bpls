@@ -1,0 +1,19 @@
+import com.rameses.annotations.*;
+import com.rameses.util.*;
+import bpls.facts.*;
+import enterprise.utils.*;
+
+public class BusinessBillingInterceptor {
+	
+	@After(pattern="BillingRuleService.execute", eval="#{ args[0].rulename == 'bpassessment' }")
+	public void businessBilling( def evt ) {
+		def p = evt.args[0];
+		def r = evt.result;
+	}
+
+	@After(pattern="BillingRuleService.execute",  eval="#{ args[0].rulename == 'bpassessment' }" )
+	public void getBillItems(def evt) {
+		//throw new Exception("after load the recurring fees");
+	}
+
+}

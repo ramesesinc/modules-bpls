@@ -1,0 +1,36 @@
+<schema>
+	
+	<element tablename="business_requirement">
+		<field name="objid" primary="true"/>
+		<field name="businessid" required="true"/>
+		<field name="applicationid" />
+		<field name="reftype" required="true"/>
+		<field name="refid" />
+		<field name="state" />		
+		<field name="refno" />
+		<field name="title" required="true"/>
+		<field name="dtissued" />
+		<field name="issuedby" />
+		<field name="placeissued" />
+		<field name="remarks"/>
+		<field name="status"/>
+		<field name="step" />
+		<field name="completedby_objid"/>
+		<field name="completedby_name"/>
+		<field name="dtcompleted"/>
+		<field name="completed"/>
+		<field name="expirydate" />
+
+
+		<complex name="ref" ref="businessrequirementtype" jointype="many-to-one" required="false" 
+			includefields="code,title,type">
+			<key field="reftype" target="objid" />
+		</complex>	
+
+		<complex name="business" ref="business" jointype="many-to-one" required="false" 
+			includefields="bin,businessname,tradename,owner.name,address.*">
+			<key field="businessid" target="objid" />
+		</complex>	
+	</element>
+
+</schema>

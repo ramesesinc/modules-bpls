@@ -1,0 +1,20 @@
+<schema adapter="bplsdb">
+	
+	<element tablename="business_application_subproc_task">
+		<field name="taskid" primary="true" prefix="BAPPPROCTSK"/>
+		<field name="refid" required="true"/>
+		<field name="parentprocessid" />
+		<field name="state"/>
+		<field name="startdate" />
+		<field name="assignee_objid"/>
+		<field name="assignee_name" caption="Assignee"/>
+		<field name="enddate"/>
+		<field name="actor_objid"/>
+		<field name="actor_name"/>
+		<field name="message"/>
+		<field name="dtcreated"/>
+		<field name="prevtaskid"/>		
+	</element>	
+
+
+</schema>

@@ -1,5 +1,5 @@
-<schema>
-	<element name="lobattribute" tablename="lobattribute">
+<schema adapter="bplsdb">
+	<element tablename="lobattribute">
 		<field name="objid" primary="true" editable="false" style="code"/>
 		<field name="state" required="true" defaultValue="DRAFT"/>
 		<field name="name" required="true" caption="Name" editable="false" searchable="true" indexed="true"/>

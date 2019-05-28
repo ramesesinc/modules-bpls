@@ -1,0 +1,66 @@
+import com.rameses.annotations.*;
+import com.rameses.util.*;
+import bpls.facts.*;
+import enterprise.utils.*;
+
+public class BusinessFactBuilderInterceptor {
+	
+	@DataContext("lob_lobattribute")
+	def lobAttrEm;
+
+	@After(pattern="FactBuilderService.getFacts", eval="#{ args[0].rulename.matches('bp.*') }")
+	public void buildBusinessInfo( def evt ) {
+		def fb = evt.result;
+		def o = evt.args[0];
+		def app = o.params.application;
+		if(!app) app = o.params;
+
+		def bapp = new BPApplication( app );
+		fb.facts << bapp;
+
+		def lobLookup = [:];
+
+		app.lobs?.each {
+			def attrs = lobAttrEm.find( [ lobid: it.lob.objid ] ).list()*.lobattributeid;
+			def lob = new LOB();
+			lob.application = bapp;
+			lob.objid = (it.lob.objid!=null) ? it.lob.objid : it.lobid;
+			lob.lobid = lob.objid;
+			lob.name = it.lob.name;
+			lob.assessmenttype = it.assessmenttype;
+			lob.classification = it.lob.classificationid;
+
+			lob.attributes = "-"+ attrs.join("-") + "-";
+			lob.assessmenttype = it.assessmenttype;
+			fb.facts << lob;
+
+			attrs.each { v->
+				fb.facts << new LOBAttribute( lob: lob, name: v, objid: v ); 
+			}
+			lobLookup.put( lob.objid, lob );
+		}
+		
+		//prepare the variable. If there is params it is the rule action requesting the fact.
+		//otherwise it is the addInfos.
+		fb.variableInfoProvider = [
+			getSchemaName: { return "businessvariable" },
+			createFact: { vv->
+				if( !vv.params ) {
+					//lookup lob here
+					if( vv.lob ) {
+						vv.lob = lobLookup.get( vv.lob.objid );
+					}	
+				}
+				else {	
+					if( vv.params.lob ) vv.lob = vv.params.lob;
+				}
+				def bi = new BusinessInfo();
+				bi.datatype = vv.datatype;
+				bi.copy( vv );
+				return bi; 	
+			}
+		] as VariableInfoProvider;
+	}
+
+
+}

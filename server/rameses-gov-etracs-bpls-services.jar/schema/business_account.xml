@@ -1,0 +1,22 @@
+<!--
+ business name will be the current name of the account.
+ this is linked to the current business of the year, thru the businessid.
+-->	
+<schema adapter="bplsdb">
+	<element tablename="business_account">
+		<field name="objid" primary="true" prefix="BUSACCT"/>
+		<field name="bin" required="true"/>
+		<field name="businessname" required="true"/>		
+		<field name="dtcreated" required="true"/>
+
+		<field name="createdby_objid"/>
+		<field name="createdby_name"/>
+		
+		
+		<field name="currentyearid" />
+		<field name="permittype" />
+		<field name="remarks" />
+		<field name="closureid" />
+
+	</element>
+</schema>

@@ -1,4 +1,4 @@
-<schema>
+<schema adapter="bplsdb">
 	<element tablename="businessrequirementtype">
 		<field name="objid" primary="true" visible="true" caption="Code"/>
 		<field name="title" required="true" caption="Title"/>
@@ -7,6 +7,7 @@
 		<field name="system" />
 		<field name="org_objid" visible="false"/>
 		<field name="org_name" />	
+		<field name="activationstate" required="true"/>
 		<field name="requiredstate" required="true"/>				
 		<field name="sortindex" required="true"/>
 	</element>	

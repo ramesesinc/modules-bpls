@@ -44,10 +44,13 @@ public class BPApplication {
         appno = app.appno;
         if(!app.appyear) 
             throw new Exception("BPApplication Fact error. Please provide an app.appyear");
+
         appyear = app.appyear;
         if(app.yearstarted) {
             this.yearstarted = app.yearstarted;
         }   
+
+        app.dateapplied = app.appdate;
         if(app.dateapplied) {
             if(!(app.dateapplied instanceof Date)) {
                 try {
@@ -74,13 +77,25 @@ public class BPApplication {
            
         apptype = app.apptype;
         txnmode = app.txnmode;
-        orgtype = app.business?.orgtype;
-        permittype = app.business?.permittype;
-        officetype = app.business?.officetype;
+        orgtype = app.orgtype;
+        permittype = app.permittype;
+        officetype = app.officetype;
 
         if(app.lastqtrpaid==null) app.lastqtrpaid = 0;
         lastqtrpaid = app.lastqtrpaid;
     }
 
+
+    public String toString() {
+        def sb = new StringBuilder();
+        sb.append( "objid:"+objid+";");
+        sb.append( "orgtype:"+orgtype+";");
+        sb.append( "apptype:"+apptype+";");
+        sb.append( "txnmode:"+txnmode+";");
+        sb.append( "appyear:"+appyear+";");
+        sb.append( "appno:"+appno+";");
+        sb.append( "permittype:"+permittype+";");
+        return sb.toString();
+    }
     
 }

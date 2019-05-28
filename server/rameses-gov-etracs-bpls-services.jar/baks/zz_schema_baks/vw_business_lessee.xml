@@ -1,0 +1,25 @@
+<!--
+DROP VIEW IF EXISTS vw_business_lessee; 	
+CREATE VIEW vw_business_lessee AS
+SELECT b.bin, b.tradename, b.owner_name, bp.permitno, bp.expirydate, bl.objid AS lessorid, ba.monthlyrent, ba.unitno,
+CASE WHEN bp.expirydate < NOW() THEN  1 ELSE 0 END AS expired 
+FROM business_address ba
+INNER JOIN business_lessor bl ON ba.rentedaddressid = bl.objid
+INNER JOIN business b ON ba.businessid = b.objid
+LEFT JOIN business_permit bp ON b.permit_objid = bp.objid;
+-->
+<schema>
+	<element tablename="vw_business_lessee">
+		<field name="bin" primary="true"/>
+		<field name="tradename" />
+		<field name="owner_name" />
+		<field name="permitno" />
+		<field name="expirydate" />
+		<field name="lessorid" />
+		<field name="monthlyrent" />
+		<field name="unitno" />
+		<field name="expired" />
+	</element>	
+</schema>
+
+

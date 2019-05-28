@@ -1,0 +1,59 @@
+<schema adapter="bplsdb">
+	<element tablename="vw_business_account">
+		<!-- objid is the account id -->
+		<field name="objid" primary="true" />		
+		<field name="bin"  />
+		<field name="businessname" />
+		<field name="currentyearid" />
+		<field name="geninfoid" />		
+		<!--
+		<field name="appno" />
+		<field name="apptype" />
+		<field name="appdate" />
+		-->
+		<field name="year" />
+		<field name="monthlyrent" />
+		<field name="orgtype" />
+		<field name="tradename" />
+		<field name="owner_objid" />
+		<field name="owner_name" />
+		<field name="owner_address_objid" />
+		<field name="owner_address_text" />
+		<field name="address_type" />
+		<field name="address_text" />
+		<field name="address_bldgno" />
+		<field name="address_unitno" />
+		<field name="address_subdivision" />
+		<field name="address_bldgname" />
+		<field name="address_street" />
+		<field name="address_barangay_objid" />
+		<field name="address_barangay_name" />
+		<field name="address_city" />
+		<field name="address_province" />
+		<field name="address_municipality" />
+		<field name="address_pin" />
+		<field name="lessor_objid" />
+		<field name="lessor_name" />
+		<field name="lessor_address_objid" />
+		<field name="lessor_address_text" />
+		<field name="rentedaddressid" />
+		<field name="ownedaddressid" />
+		<field name="phoneno" />
+		<field name="mobileno" />
+		<field name="email" />
+
+		<field name="permitid" />		
+		<field name="permitno" />
+		<field name="permitexpirydate" />
+		<field name="renewaldate" />
+
+		<field name="closureid" />
+		<field name="taskstate" />
+
+		<!-- show only lobs for this year -->
+		<complex name="lobs" ref="vw_business_account_lob" jointype="one-to-many">
+			<key field="currentyearid" target="businessyearid" />
+		</complex>	
+
+	</element>
+</schema>

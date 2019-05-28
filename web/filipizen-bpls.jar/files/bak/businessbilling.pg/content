@@ -1,0 +1,128 @@
+<%
+def errmsg = null; 
+if ( PARAMS.error instanceof Throwable ) {
+  errmsg = PARAMS.error.message; 
+} else if ( PARAMS.error  ) {
+  errmsg = PARAMS.error.toString(); 
+} else if ( PARAMS.errmsg  ) {
+  errmsg = PARAMS.errmsg; 
+}
+
+def appno = "B"+ PARAMS.info?.id; 
+if ( errmsg != null ) {
+  println '<pre id="global-error" class="error" style="margin:10px 0px 10px 0px;">'+ errmsg +'</pre>';  
+}
+
+def hash = com.rameses.util.Encoder.MD5.encode(new java.rmi.server.UID().toString()); 
+def paths = REQUEST.pathInfo.toString().split('/'); 
+def ctxpath = (paths.length > 1 ? paths[1] : ''); 
+def errorurl = [REQUEST.pathInfo, (REQUEST.queryString? REQUEST.queryString : '')].join('?'); 
+%>
+
+<script src="/js/lib/crypto-md5.js" type="text/javascript"></script>
+<script>
+\$register({ id:'popup', page:'/payquarter', context:'payoption', title:'Select Pay Option' });
+
+var controller = new function() {
+  var self = this; 
+
+  this.orgcode = '${PARAMS.info?.id}'; 
+  this.appno = null; 
+
+  this.conf = {
+    ctxpath: '${ctxpath}', orgname: '${PARAMS.info?.clusterid}_${PARAMS.info?.name}', 
+    errorurl: '${errorurl}', hashkey: '${hash}', txntype: 'bpls', orgcode: '${PARAMS.info?.id}' 
+  } 
+
+  this.data = {} 
+  this.option = {} 
+
+  this.showError = function( o ) {
+    \$('#global-error').remove(); 
+    var e = \$('#error-section'); 
+    if ( o ) {
+      e.html('<pre class="error" style="margin:10px 0px 10px 0px;">'+ o +'</pre>'); 
+    } else {
+      e.html(' ');       
+    }
+  }
+
+  this.responseHandler = function( o, stat ) {
+    self.showError( null );  
+    if ( 'error' == stat ) { 
+      self.data = {}; 
+      self.showError( o.result ); 
+      return; 
+    } 
+
+    var outcome = 'default'; 
+    if ((typeof o) == 'object') { 
+      self.data = o.result; 
+      outcome = 'billpage'; 
+    } 
+    else { 
+      self.data = {}; 
+    }  
+    self._controller.navigate( outcome ); 
+  }
+
+  this.search = function() { 
+    if ( !self.appno ) { 
+      self.showError('Business Application Number is required'); 
+      return; 
+    } 
+
+    var svc = Service.lookup( self.orgcode +':PartnerPaymentService'); 
+    var p = { txntype: 'bpls', refno: self.appno, orgcode: self.orgcode, showdetails: true } 
+    if ( self.option.qtr ) p.qtr = self.option.qtr; 
+
+    svc.getBilling( p, self.responseHandler ); 
+  }
+
+  this.chooseQtr = function() {
+      var handler = function( x ) {
+        var num = parseInt( x ); 
+        if ((typeof num) == 'number') {
+          self.option.qtr = (num < 4 ? num : null); 
+        } else {
+          self.option.qtr = null; 
+        } 
+        self.search();
+      } 
+      return new PopupOpener( "popup", { callbackHandler: handler }); 
+  }
+
+  this.getBillPeriod = function() {
+    if ( self.data && self.data.info ) {
+      if ( self.option.qtr ) {
+        var expirydate = self.data.info.expirydate;
+        if ( expirydate ) {
+          var yr = expirydate.split('-')[0]; 
+          return (''+ yr +'-Q'+ self.option.qtr);
+        }
+      } else {
+        return 'FULL YEAR'; 
+      } 
+    }
+    return ""; 
+  }
+ 
+  this.pay = function() { 
+    var encstr = CryptoJS.MD5(''+ self.conf.txntype + self.conf.orgcode + self.appno ); 
+    \$('#conf-hashkey').val( encstr ); 
+    \$('#payform').submit(); 
+  } 
+
+  this.cancelPaymentOrder = function() { 
+    \$('#cancelpayform').submit(); 
+  }   
+}
+
+\$put( "${PAGE.context}", controller, {
+  "default": "/services/business/businessbilling/searchpage",
+  "billpage": "/services/business/businessbilling/billpage"
+})
+</script>
+
+<div id="error-section"></div> 
+<div r:controller="${PAGE.context}"></div>

@@ -1,5 +1,4 @@
-
-<schema>
+<schema adapter="bplsdb">
 
 	<element tablename="psic">
 		<field name="objid" primary="true" visible="true" caption="Code" searchable="true"/>

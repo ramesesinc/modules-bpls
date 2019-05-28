@@ -1,0 +1,18 @@
+def c = [
+    "app.host" : "localhost:8070",
+    "app.cluster" : "osiris3",
+    "app.context" : "etracs25"
+];
+
+def tp = new TestProxy(c);
+
+def qSvc = tp.create("QueryService");
+def n = [_schemaname: "vw_business_application"];
+n.where = ["apptype = 'RETIRE' "];
+def p = qSvc.findFirst( n );
+
+def clos = [_schemaname:'business_closure'];
+clos.appid = p.objid;
+svc.create(clos);
+
+

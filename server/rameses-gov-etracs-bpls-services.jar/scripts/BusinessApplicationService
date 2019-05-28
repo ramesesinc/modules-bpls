@@ -1,218 +1,175 @@
 import com.rameses.annotations.*;
 import com.rameses.util.*;
 import java.rmi.server.*;
-import com.rameses.services.extended.*;
+import com.rameses.rules.common.*;
+import java.text.*;
 
+/*************************************************
+* This creates a new business application for 
+* NEW, RENEW, RETIRE, ADDITIONAL, RETIRELOB, OTHERS
+*************************************************/
 public class BusinessApplicationService  {
+	
+	@DataContext("business_generalinfo")
+	def genInfoEm;
 
-	@ActiveDB("business_application")
-	def em;
+	@DataContext("business_application")
+	def appEm;
 
-	@ActiveDB("business_permit")
-	def permitEm;
+	@DataContext("business_account")
+	def acctEm;
+
+	@DataContext("business_year")
+	def businessYearEm;
+
+	@Service("ControlnoGeneratorService")
+	def controlNoSvc;
 
 	@Service("DateService")
 	def dateSvc;
 
-	@Service("BusinessMasterService")
-	def bizSvc;
+	@Service("WorkflowTaskService")
+	def taskSvc;
 
-	@Service("BusinessLobService")
-	def lobSvc;
+	@DataContext("vw_business_account")
+	def vwAcctEm;
 
-	@Service("BusinessInfoService")
-	def infoSvc;
+	@DataContext("vw_business_account_lob")
+	def vwAcctLobEm;
 
-	@Service("BusinessRequirementService")
-	def reqSvc;
-
-	@Service("BusinessReceivableService")
-	def receivableSvc;
-
-	@Service("BusinessUserRoleService")
-	def userRoleSvc;
-
-	@Service 
-	def self; 
-
-	@Env
-	def env;
-
-	/**********************************************************
-	* called when creating new,renew,amend,retire applications
-	***********************************************************/ 
-	@ProxyMethod
-	public def initNew(o) {
-		if(!o.txnmode) o.txnmode = 'ONLINE';
-
-		def entity = [:];
-		entity.apptype = o.apptype;
-		entity.txnmode = o.txnmode;
-		if(!o.appyear) o.appyear = dateSvc.getServerYear();
-		entity.appyear = o.appyear;
-		if(entity.appqtr==null)
-		entity.dtfiled = dateSvc.format( 'yyyy-MM-dd', dateSvc.getServerDate());
-        entity.requirements = [];
-        entity.appinfos = [];
-        entity.assessmentinfos = [];
-        entity.taxfees = [];
-    	entity.totals = [tax:0,othercharge:0,regfee:0,total:0];
-    	entity.business = [objid: o.businessid];
-        return entity;
+	def generateAppNo = { bin, apptype ->
+		def suff = "";
+		if( apptype == 'NEW') suff = "N";
+		else if( apptype == 'RENEW') suff = "R";
+		else if( apptype == 'ADDITIONAL') suff = "A";
+		else if( apptype == 'RETIRE') suff = "X";		
+		return bin + suff;	
 	}
 
-	@ProxyMethod
-	public def create(def o) {
-		if( !o.apptype ) {
-			throw new Exception("apptype must be provided"); 
-		} 
-		if( !o.objid ) {
-			throw new Exception("app objid must be provided. Please check the interceptor providers in initNew");
+	def createInfo = { o, acctid->
+		def m = [:];
+		m.businessacctid= acctid;
+		m.orgtype=o.orgtype;
+		m.tradename=o.tradename;
+		m.owner=o.owner;
+		m.address=o.address;
+		m.lessor=o.lessor;
+		m.rentedaddressid=o.rentedaddressid	;
+		m.ownedaddressid=o.ownedaddressid	;
+		m.mobileno=o.mobileno;
+		m.phoneno=o.phoneno;
+		m.email=o.email;
+		m.dtcreated = o.dtcreated;
+		m = genInfoEm.create(m);
+		return m;		
+	}
+
+	def createYearEntry = { o, acctid, infoid ->
+		def m = [:];
+		m.year = o.appyear;
+		m.geninfoid = infoid;
+		m.businessacctid = acctid;
+		m.permitid = null;
+		m = businessYearEm.create(m);
+		return m;		
+	}
+
+	def createNewOrCapture( def app ) {
+		if( !app.lobs ) throw new Exception("Please specify lobs in application");
+		if( !app.appyear ) throw new Exception("Please specify appyear in application");		
+		def acct = [:];
+		acct.bin = controlNoSvc.getNextNo( "B[org][yyyy][%06d]" );
+		acct.businessname = app.businessname;
+		acct.dtcreated = dateSvc.getServerDate(); 
+		acct = acctEm.create( acct );
+		
+
+		//set application properties
+		def geninfo = createInfo( app, acct.objid );	
+		def yearentry = createYearEntry( app, acct.objid, geninfo.objid );
+		
+		app.businessacctid = acct.objid;		
+		app.geninfoid = geninfo.objid;
+		app.businessyearid = yearentry.objid;
+		app.dtcreated = acct.dtcreated;
+		app.appdate = acct.dtcreated;
+		app.bin = acct.bin;
+		app.appno =  generateAppNo(app.bin, app.apptype);
+		appEm.create(app);
+
+	}
+
+	def createRenew( def app ) {
+		if( !app.businessacctid ) throw new Exception("Please specify business in renewal application");
+		if( !app.lobs ) throw new Exception("Please specify lobs in renewal application");
+		def dtfiled = dateSvc.getServerDate(); 
+		def acct = vwAcctEm.find([objid:app.businessacctid]).first();
+		if( (acct.year + 1) != app.appyear )
+			throw new Exception("Year must be an increment from last year renewed/registered");
+		if( acct.renewaldate !=null && acct.renewaldate.after( dtfiled ) )
+			throw new Exception("This is not yet scheduled for renewal. Please check renewaldate");	
+		def yearentry = createYearEntry( app, acct.objid, acct.geninfoid );
+		app.appno = generateAppNo(acct.bin, app.apptype);		
+		app.geninfoid = acct.geninfoid;
+		app.businessyearid = yearentry.objid;
+		app.appdate = app.txndate;
+ 		appEm.create(app);
+
+		def renewalDate = (new SimpleDateFormat("yyyy-MM-dd")).parse(app.appyear+"-01-01");
+		def businessacctid = app.businessacctid;
+		acctEm.find([objid: businessacctid ] ).update( [currentyearid: app.businessyearid ]);
+		businessYearEm.find( [objid: app.businessyearid ] ).update( [appid: app.objid, renewaldate: renewalDate] );
+	}
+
+	def createAmend( def app ) {
+		if( app.apptype.matches('RETIRE|RETIRELOB')) {
+			if(!app.retiredlobs) throw new Exception("There are no lines of business to retire")
 		}
-		if( !o.appno ) {
-			throw new Exception("appno must be provided. Please check the interceptor providers for "+o.apptype);
+		if( !app.businessacctid ) throw new Exception("Please specify businessacctid in application");
+		def acct = vwAcctEm.find([objid:app.businessacctid]).first();
+		app.appno = generateAppNo(acct.bin, app.apptype);
+		app.geninfoid = acct.geninfoid;
+		app.businessyearid = acct.currentyearid;		
+		app.appdate = app.txndate;	
+		appEm.create(app);
+		def renewalDate = (new SimpleDateFormat("yyyy-MM-dd")).parse(app.appyear+"-01-01");
+		def businessacctid = app.businessacctid;
+		acctEm.find([objid: businessacctid ] ).update( [currentyearid: app.businessyearid ]);
+		businessYearEm.find( [objid: app.businessyearid ] ).update( [appid: app.objid, renewaldate: renewalDate] );		
+	}
+
+	@ProxyMethod
+	public def create( def app ) {
+		def dt = dateSvc.getServerDate();
+		app.txndate = dt;
+
+		//correct the data
+		if( app.infos ) {
+			app.infos.each { it.type = 'appinfo' };
 		}
-		o.txndate = dateSvc.getServerDate();
-		if(!o.dtfiled) o.dtfiled = o.txndate;
-		if(!o.state) o.state = 'INFO';
-		if(!o.appqtr) o.appqtr = 0;
-		o.createdby = [objid:env.USERID,name:env.FULLNAME];
-		o.ownername = o.business.owner.name;
-		o.owneraddress = o.business.owner?.address?.text;
-		o.tradename = o.business.tradename;
-		o.businessaddress = o.business.address?.text;
-		em.create(o);
-		return o;
-	}
-
-	@ProxyMethod
-	public def open( def o ) {
-		o = em.read( o );
-		o.business = bizSvc.open( [objid: o.business.objid] );
-		if(!o.exclude_lob) o.lobs = lobSvc.getAppLobs([applicationid: o.objid]);
-		if(!o.exclude_info) o.appinfos = infoSvc.getAppInfos( [applicationid: o.objid] );
-		if(!o.exclude_requirement) o.requirements = reqSvc.getList( [applicationid: o.objid, businessid: o.business.objid] );
-		o.barcode = '51005:'+o.appno;
-
-		//check if there is permit. include it.
-		o.permit = permitEm.findPermitByApplication([applicationid: o.objid]);
-
-		if (o.assessor?.objid) { 
-			def uinfo = userRoleSvc.findUser([objid: o.assessor.objid]); 
-			if (uinfo) o.assessor.name = uinfo.name; 
-		} 
-		return o;
-	}
-
-	/**
-	* Update must be overridden by the interceptors
-	*/
-	@ProxyMethod
-	public def update(o) {
-		throw new Exception("stop updates!");
-		boolean hasUpdates = true;
-		if( o.update_assessor ) {
-
+		if( app.lobs ) {
+			app.lobs.findAll{ it.lob != null }.each { it.lobid = it.lob.objid };
 		}
-		if(o.update_approver) {
-			hasUpdates = true;
+
+		if(app.apptype == 'NEW' || app.txnmode == 'CAPTURE') {
+			createNewOrCapture( app );
 		}
-		if(hasUpdates) em.update(o);
-		return o;
+		else if( app.apptype == 'RENEW') {
+			createRenew( app );
+		}
+		else {
+			createAmend( app );
+		}
+
+		//fire the workflow
+		if( app.txnmode == 'ONLINE' ) {
+			def p = [:];
+			p.processname = 'business_application';
+			p.refid = app.objid;
+			p.startdate = dt;
+			p.info = app;
+			taskSvc.start(p);
+		}
 	}
 
-
-	@ProxyMethod
-	public def cancel(def o) {
-		o.state = 'CANCELLED';
-		em.update( o );
-	}
-
-	
-
-	@ProxyMethod
-	public def checkReleaseStatus(def o) {
-		return [:];
-	}
-
-	/**
-	* The application's state must be set by the interceptors to flag if this can be released or not
-	*/
-	@ProxyMethod
-	public def release(def o) {
-		o.state = 'COMPLETED'
-		em.update( o );
-		return o;
-	}
-
-	@ProxyMethod
-	public def findIdByAppno(o) {
-		return em.findIdByAppno(o);
-	}
-
-	@ProxyMethod
-	public def openByAppno(o) {
-		def id = em.findIdByAppno(o)?.objid;
-		if(!id) throw new Exception("App No " + o.appno + " does not exist!");
-		return self.open([ objid: id ]); 
-	}
-
-	@ProxyMethod
-	public def updateInfos( b ) {
-		lobSvc.addAppLobs( b );
-		infoSvc.addAppInfos( b );
-		reqSvc.addRequirements( b );
-		receivableSvc.removeReceivables( b );
-	}
-
-	
-	@ProxyMethod
-	public void updatePermit( def o ) {
-		if( !o.applicationid ) throw new Exception("applicationid is required in BusinessApplicationService.issuePermit");
-		if( !o.permitid ) throw new Exception("permitid is required in BusinessApplicationService.issuePermit");
-		o.dtreleased = dateSvc.getServerDate();
-		em.updatePermit( o );
-	}
-
-	@ProxyMethod 
-	public void saveAssessment( o ) {
-		/*
-			1. persist application nextbilldate
-			2. persist assessment infos 
-			3. persist receivables 
-			4. persist bill items 
-		*/
-		em.updateNextBillDate([ applicationid: o.objid, nextbilldate: o.nextbilldate ]);
-		def b = [businessid: o.businessid, 
-			activeyear: o.appyear, 
-			applicationid: o.objid, 
-			assessmentinfos: o.assessmentinfos, 
-			entries: o.taxfees, 
-			lobs: o.lobs 
-		];
-		infoSvc.addAssessmentInfos(b);				
-		receivableSvc.addReceivables(b); 
-	}
-
-	@ProxyMethod 
-	public def getStatus( params ) { 
-		def info = em.read([objid: params.objid]); 
-		return info?.state; 
-	}
-
-	@ProxyMethod 
-	public void revert( params ) {
-		/* interceptors will handle other revert routines */
-	} 
-
-
-
-
-	@ActiveDB("business_application_task")
-	def apptaskdb;
-
-	@ProxyMethod 
-	public def findLastTask( params ) { 
-		return apptaskdb.findLastTask([ refid: params.applicationid ]); 
-	}
 }

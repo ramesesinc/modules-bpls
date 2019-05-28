@@ -1,0 +1,128 @@
+import com.rameses.annotations.*;
+import com.rameses.util.*;
+import java.rmi.server.*;
+import bpls.facts.*;
+
+public class BusinessApplicationNewInterceptor {
+
+	@Env
+	def env;
+
+	@DataContext("business")
+	def businessEm;
+
+	@DataContext("business_account")
+	def businessAcctEm;
+
+	@DataContext("business_general_info")
+	def genInfoEm;
+
+	@Service("DateService")
+	def dateSvc;
+
+	@Service("WorkflowTaskService")
+	def workFlowSvc;
+
+	//@Service("ControlnoGeneratorService")
+	//def controlnoSvc;
+
+	def formatInfo = {
+		if( !it.value ) return;
+        if(it.datatype == "decimal") {
+            it.decimalvalue = it.value;
+        }
+        else if(it.datatype == "integer") {
+            it.intvalue = it.value;
+        }
+        else if( it.datatype == "date") {
+            it.datevalue = it.value;
+        }
+        else if( it.datatype == "boolean") {
+            it.booleanvalue = it.value;
+        }
+        else {
+            it.stringvalue = it.value;
+        }
+	}
+
+	@Before(pattern="PersistenceService.create", 
+		eval="#{args[0]._schemaname=='business_application' && (args[0].apptype == 'NEW' || args[0].txnmode == 'CAPTURE' )}")
+	public void beforeCreate(def evt) { 
+		def entity = evt.args[0];
+
+		if(!entity.lobs)
+			throw new Exception("Please add at least one line of business");
+		if(!entity.infos)
+			throw new Exception("Please add at least one business info");
+
+		/*	
+		def cn = controlnoSvc.getNextNo( "business_controlno", "bin", null );	
+		throw new Exception("Next controlno is " + cn );
+		*/
+
+		//create business acct
+		def acct = [:];
+		acct.bin  = "XXXX00011";
+		acct.dtcreated = dateSvc.getServerDate();
+		acct.businessname = entity.businessname;
+		acct.mobileno = entity.mobileno; 
+		acct.phoneno = entity.phoneno;
+		acct.email = entity.email;
+		acct.permittype = entity.permittype;
+		acct = businessAcctEm.create( acct );
+
+		//create the general info
+		def info = [:];
+		info.bin = acct.bin;
+		info.tradename = entity.tradename;
+		info.orgtype = entity.orgtype;
+		info.owner = entity.owner;
+		info.address = entity.address;
+		info.lessor = entity.lessor;
+		info = genInfoEm.create( info );
+
+		//create business
+		def bus = [:];
+		bus.bin = acct.bin;
+		bus.year = entity.appyear;
+		bus.generalinfoid = info.objid;
+		bus.monthlyrent = entity.monthlyrent;
+		bus = businessEm.create( bus );
+
+		//update the business account to the latest businessid
+		businessAcctEm.find( [bin: acct.bin ] ).update( [businessid: bus.objid ] );
+
+		//update the application fields
+		entity.appno = "APP00001";
+		entity.businessid = bus.objid;
+		entity.generalinfoid = info.objid;
+
+		entity.lobs.each {
+			it.businessid = bus.objid;
+			if( !it.assessmenttype ) it.assessmenttype = "NEW";
+			it.lobid = it.lob.objid;
+		}
+		entity.infos.each {
+			it.businessid = bus.objid;
+			it.type = "info";
+			formatInfo( it );
+		}
+		entity.requirements.each {
+			it.typeid = it.type;
+		}
+	}
+
+	@After(pattern="PersistenceService.create", 
+		eval="#{args[0]._schemaname=='business_application' && (args[0].apptype == 'NEW' || args[0].txnmode == 'CAPTURE' )}")
+	public void afterCreate(def evt) { 
+		def entity = evt.result;
+		businessEm.find( [objid: entity.businessid ] ).update( [appid: entity.objid ] );
+
+		def wf = [:];
+		wf.refid = entity.objid;
+		wf.processname = "business_application";
+		workFlowSvc.start(wf)
+	}	
+
+
+}

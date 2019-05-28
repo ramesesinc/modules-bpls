@@ -1,0 +1,25 @@
+def c = [
+    "app.host" : "localhost:8070",
+    "app.cluster" : "osiris3",
+    "app.context" : "etracs25"
+];
+
+def tp = new TestProxy(c);
+
+def qSvc = tp.create("QueryService");
+def n = [_schemaname: "business_account"];
+n.where = ["1=1"];
+def p = qSvc.findFirst( n );
+
+def svc = tp.create("PersistenceService");
+def m = [_schemaname: 'vw_business_account' ];
+m.objid = p.objid;
+def acct = svc.read(m);
+
+acct.each { k,v->
+    if(k!="lobs") println k+"="+v;
+}
+println "count lobs " + acct.lobs.size();
+acct.lobs.each {
+    println it;
+}

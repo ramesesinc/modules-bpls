@@ -1,0 +1,67 @@
+<schema adapter="bplsdb">
+	<element tablename="vw_business_application">
+		<field name="objid" primary="true"/>
+		<field name="businessacctid" />
+		<field name="geninfoid" />
+		<field name="businessyearid" />
+
+		<field name="appno" />
+		<field name="apptype" />
+		<field name="appdate" />
+		<field name="year" />
+		<field name="monthlyrent" />
+		<field name="bin" />
+		<field name="businessname" />
+		<field name="phoneno" />
+		<field name="mobileno" />
+		<field name="email" />
+		<field name="orgtype" />
+		<field name="tradename" />
+		<field name="owner_objid" />
+		<field name="owner_name" />
+		<field name="owner_address_objid" />
+		<field name="owner_address_text" />
+		<field name="address_type" />
+		<field name="address_text" />
+		<field name="address_bldgno" />
+		<field name="address_unitno" />
+		<field name="address_subdivision" />
+		<field name="address_bldgname" />
+		<field name="address_street" />
+		<field name="address_barangay_objid" />
+		<field name="address_barangay_name" />
+		<field name="address_city" />
+		<field name="address_province" />
+		<field name="address_municipality" />
+		<field name="address_pin" />
+		<field name="lessor_objid" />
+		<field name="lessor_name" />
+		<field name="lessor_address_objid" />
+		<field name="lessor_address_text" />
+		<field name="rentedaddressid" />
+		<field name="ownedaddressid" />
+		<field name="taskid" />
+
+		<complex name="task" ref="business_application_task" jointype="many-to-one" required="false">
+			<key field="taskid" target="taskid" />
+		</complex>
+
+		<complex name="lobs" ref="vw_business_application_lob" jointype="one-to-many" orderBy="lob.name">
+			<key field="objid" target="appid" />
+		</complex>	
+
+		<complex name="appinfos" ref="vw_business_application_info" jointype="one-to-many">
+			<key field="objid" target="appid" />
+		</complex>	
+
+		<!--
+		<complex name="assessmentinfos" ref="vw_business_application_assessmentinfo" jointype="one-to-many">
+			<key field="objid" target="appid" />
+		</complex>	
+	
+		<complex name="requirements" ref="business_application_requirement" jointype="one-to-many">
+			<key field="objid" target="appid" />
+		</complex>	
+		-->
+	</element>
+</schema>

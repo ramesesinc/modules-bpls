@@ -1,4 +1,4 @@
-<schema>
+<schema adapter="bplsdb">
 
 	<element tablename="lob_lobattribute">
 		<field name="lobid" primary="true"/>

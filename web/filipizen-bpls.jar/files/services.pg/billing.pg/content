@@ -1,0 +1,57 @@
+
+<script>
+	\$register( {id:'askbin', page:"${PAGE.path}/askbin", 	  context: 'askbin' } );
+	\$register( {id:'viewbill', page:"${PAGE.path}/viewbill", context: 'viewbill' } );
+
+	\$put( "billing", new function() {
+
+		var self = this;
+		this.error;
+		this.orgcode = "${PARAMS.info.id}";
+		this.bill;
+		this.payorderdetails;
+		this.lgu = {title:"${PARAMS.info.title}", group: "${PARAMS.info.group.title}"};
+
+
+		var hash = window.location.hash;
+		if( !hash ) {
+			window.location.hash = "askbin";
+		}
+
+		var _service;
+		this.getBillingService = function() {
+			if( !_service ) {
+				_service = Service.lookup(this.orgcode + ":BusinessBillingService");
+			}
+			return _service;
+		}
+
+		this.loadBill = function( params, handler ) {
+			self.getBillingService().getBilling( params, function(o,s) {
+				if( s == "error" ) {
+					self.error = o.result;
+					self._controller.refresh();
+				}
+				else {
+					self.error = null;
+					self._controller.refresh();	
+					self.payorderdetails = o.result;
+					self.bill = o.result.info;
+					self.bill.amount = o.result.amount;
+					console.log( o.result );
+					handler();
+				}
+			});
+		}
+
+
+
+	})
+</script>
+
+
+<div r:context="billing" r:visibleWhen="#{error!=null}">
+  <label r:context="billing" style="color:red;">#{error}</label>
+</div>
+
+<div id="content"></div>

@@ -1,0 +1,63 @@
+import com.rameses.annotations.*;
+import com.rameses.util.*;
+import java.rmi.server.*;
+import java.text.*;
+import bpls.facts.*;
+
+public class BusinessPermitPersistenceInterceptor {
+
+	@Service("ControlnoGeneratorService")
+	def controlNoSvc;
+
+	@Service("DateService")
+	def dateSvc;
+
+	@DataContext("vw_business_account_lob")
+	def lobEm;
+
+	@DataContext("vw_business_application")
+	def appEm;
+
+	@DataContext("business_year")
+	def businessYearEm;	
+
+	@Env
+	def env;
+
+	//before generating the permit ensure to select the current business account
+	@Before(pattern="PersistenceService.create", eval="#{ args[0]._schemaname == 'business_permit' }")
+	public void beforeCreatePermit(def evt) {
+		def permit = evt.args[0];
+
+		def dt = dateSvc.getServerDate();
+
+		if( !permit.appid ) throw new Exception("Please add an appid in permit");
+
+		def app = appEm.find( [objid: permit.appid ]).first(); 
+		if( !app.apptype.matches("NEW|RENEW|ADDITIONAL|RETIRELOB"))
+			throw new Exception("App Type must be NEW,RENEW,ADDITIONAL or RETIRELOB");
+		permit.dtissued = dt;
+		permit.businessyearid = app.businessyearid;
+		permit.geninfoid = app.geninfoid;
+		permit.permitno = controlNoSvc.getNextNo( "BP[org][yyyy][%06d]" );
+		if( !permit.permitttype ) permit.permittype = "STANDARD"; 
+		if( !permit.expirydate ) permit.expirydate = (new SimpleDateFormat("yyyy-MM-dd")).parse( app.appyear +  "-12-31" );
+
+		permit.lobs = [];
+		//find all business lobs and add to permit
+		def lobList = lobEm.find([businessyearid: app.businessyearid]).list();
+		lobList.each {
+			permit.lobs << [businesslobid: it.objid];
+		}
+	} 
+
+	@After(pattern="PersistenceService.create", index=50, eval="#{args[0]._schemaname == 'business_permit' }")
+	public void afterCreatePermit(def evt) {
+		def permit = evt.args[0];
+		def yearid = permit.businessyearid; 	
+		businessYearEm.find( [objid: yearid ] ).update( [permitid: permit.objid] );
+	} 
+
+
+
+}
