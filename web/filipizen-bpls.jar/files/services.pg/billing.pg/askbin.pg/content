@@ -12,33 +12,10 @@
 			});
 		}
 
-
 	})
 </script>
 
-
-
-<div style="padding-top:0px;">
-  <div class="row">
-      <div class="col-md-12">
-        <div class="row">
-          <div class="col-md-4">
-            <div class="control-group">
-                <label class="control-label">Specify Business Application No.</label>
-                
-                  <div class="form-group">
-                    <div class="input-group">
-                      <input type="text" r:context="askbin" r:name="refno" class="form-control input-response" required/>
-
-                      <span class="input-group-btn">
-						<input type="button" value="Submit" r:context="askbin" r:name="search" 
-                        	   class="btn-response btn btn-submit btn-primary" />
-                      </span>
-                    </div>
-                  </div>
-              </div> 
-          </div>
-        </div>
-      </div>
-  </div>
+<div class="form">
+  @wx:text(caption:'Enter BIN or Application No', context:'askbin', name:'refno', captionClass:'+w250')
 </div>
+@wx:button( caption:'Submit', context:'askbin', name:'search')

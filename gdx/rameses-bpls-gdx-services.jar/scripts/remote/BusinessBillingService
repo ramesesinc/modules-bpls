@@ -8,9 +8,7 @@ public class BusinessBillingService {
 
 	@Service(value="OnlinePaymentService", connection="local-etracs")
 	def service;
-
-	@Service(value="EPaymentService")
-	def epmtSvc;
+ 
 
 	@ProxyMethod
 	public def getBilling(def params) {

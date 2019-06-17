@@ -49,6 +49,7 @@
 	})
 </script>
 
+<h1>Business Online Billing</h1>
 
 <div r:context="billing" r:visibleWhen="#{error!=null}">
   <label r:context="billing" style="color:red;">#{error}</label>

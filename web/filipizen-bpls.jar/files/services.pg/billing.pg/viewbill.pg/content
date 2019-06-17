@@ -83,14 +83,13 @@
       var pp = {refno:this.refno, qtr:this.qtr};
       pp.orgcode = app.orgcode;
       pp.origin = "filipizen";
-      pp.txntype = "bpls";
+      pp.txntype = "rptis";
       svc.createPaymentOrder( pp, function(o,s) {
           if( s == "error" ) {
             alert("error " + o.result );
           }
           else {
             var refno = o.result.objid;
-            alert("refno is " + refno);
             WindowUtil.load( "/partners/${PARAMS.name}/paymentorder", {refno: refno});          
           }  
       });
