@@ -1,58 +1,215 @@
+<style type="text/css">
+.fade.in {
+    background: #00000030;
+}
+.close {
+    line-height: .6;
+}
+#barcode {
+    float: right;
+    height:80px;
+}
+
+@media print {
+  .navbar-inverse{display:none}
+  .footer{display:none}
+  .no-print{display:none}
+  .print{margin:30px}
+  .left{float:left}
+  .right{right}
+  #blackbar{display:none}
+  #Header, #Footer { display: none ! important; }
+  @page {size: auto;margin: 0mm;}
+}
+@media screen{
+  #barcode{display:none;}
+}
+.caption-class { width:200px; }
+</style>
 
 <script>
-	\$register( {id:'askbin', page:"${PAGE.path}/askbin", 	  context: 'askbin' } );
-	\$register( {id:'viewbill', page:"${PAGE.path}/viewbill", context: 'viewbill' } );
-
 	\$put( "billing", new function() {
-
 		var self = this;
 		this.error;
-		this.orgcode = "${PARAMS.info.id}";
+		this.mode;
 		this.bill;
+		this.refno;
+		this.qtr;
+		this.barcode;
 		this.payorderdetails;
+		this.orgcode = "${PARAMS.info.id}";    	
 		this.lgu = {title:"${PARAMS.info.title}", group: "${PARAMS.info.group.title}"};
+		this.qtrs;
+		this.txntype = "bpls";
 
+		var svc = Service.lookup(self.orgcode + ":EPaymentService");
 
-		var hash = window.location.hash;
-		if( !hash ) {
-			window.location.hash = "askbin";
-		}
-
-		var _service;
-		this.getBillingService = function() {
-			if( !_service ) {
-				_service = Service.lookup(this.orgcode + ":BusinessBillingService");
-			}
-			return _service;
-		}
-
-		this.loadBill = function( params, handler ) {
-			self.getBillingService().getBilling( params, function(o,s) {
+		this.loadBill = function() {
+			var params = {refno: this.refno, txntype: this.txntype, showdetails:true };
+			if(this.qtr) params.qtr = this.qtr;
+			svc.getBilling( params, function(o,s) {
 				if( s == "error" ) {
 					self.error = o.result;
-					self._controller.refresh();
 				}
 				else {
 					self.error = null;
-					self._controller.refresh();	
+					self.mode = "viewbill";
 					self.payorderdetails = o.result;
 					self.bill = o.result.info;
 					self.bill.amount = o.result.amount;
-					console.log( o.result );
-					handler();
+					self.barcode = "51001:"+self.bill.billno; 					
 				}
+				self._controller.refresh();
 			});
 		}
 
+		this.viewInitial = function() {
+			self.mode = "initial";
+		}
 
+		this.recomputeBill = function() {
+			this.loadBill();
+			\$('#payOption').modal('hide');
+		}
+
+		this.closeOption = function() {
+			\$('#payOption').modal('hide');
+		}
+
+		this.showPayOption = function() {
+			\$('#payOption').modal('show');
+		}
+
+		this.onload = function() {
+			this.refno = WindowUtil.getParameter("refno");
+			this.qtr = WindowUtil.getParameter("qtr");
+			this.qtrs = [4,3,2,1];
+			if(this.refno) {
+				this.loadBill(); 
+			}
+			else {
+				this.qtr = 4;
+				this.mode = "initial";
+			}	
+		}
+
+		this.printBill = function() {
+			window.print();	
+		}
+
+		this.createPaymentOrder = function() {
+		    var pp = {};
+		    pp.refno = this.refno;
+		    pp.orgcode = self.orgcode;
+		    pp.origin = "filipizen";
+		    pp.txntype = this.txntype;
+		    if(this.qtr) pp.qtr = this.qtr;
+		    svc.createPaymentOrder( pp, function(o,s) {
+		        if( s == "error" ) {
+		          alert("error " + o.result );
+		        }
+		        else {
+		          var refno = o.result.objid;
+		          WindowUtil.load( "/epayment/paymentorder", {refno: refno});          
+		        }  
+		    });
+		}
 
 	})
 </script>
 
-<h1>Business Online Billing</h1>
 
-<div r:context="billing" r:visibleWhen="#{error!=null}">
+<div r:context="billing" r:visibleWhen="#{error!=null}" style="display:none;">
   <label r:context="billing" style="color:red;">#{error}</label>
 </div>
 
-<div id="content"></div>
+<div r:context="billing" r:visibleWhen="#{mode == 'initial'}" style="display:none;">
+	<div class="form">
+	  @wx:text(caption:'BIN or Application No', context:'billing', name:'refno')
+	</div>
+	@wx:button( caption:'Submit', context:'billing', name:'loadBill')
+</div>
+
+<div r:context="billing" r:visibleWhen="#{mode == 'viewbill'}" style="display:none;">
+
+	<div class="print">
+		<div class="right">
+      		<img id="barcode"/>
+    	</div>
+		<div class="form">
+			@wx:label(caption:'Application No', context:'billing', expr:'#{bill.appno}')
+			@wx:label(caption:'App Type', context:'billing', expr:'#{bill.apptype}')			
+			@wx:label(caption:'Date Filed', context:'billing', expr:'#{bill.appdate}')
+			@wx:label(caption:'Agency', context:'billing', expr:'#{lgu.title}, #{lgu.group}')
+			@wx:label(caption:'BIN', context:'billing', expr:'#{bill.bin}')			
+			@wx:label(caption:'Trade Name', context:'billing', expr:'#{bill.tradename}')
+			@wx:label(caption:'Owner Name', context:'billing', expr:'#{bill.ownername}')
+			@wx:label(caption:'Business Address', context:'billing', expr:'#{bill.address}')
+		</div>
+		<div>	
+			<table class="table" r:context="billing" r:items="bill.items" r:name="selectedItem" r:varName="k" r:varStatus="stat">
+	            <thead>
+	              <tr>
+	                <th align="left">Line of Business</th>
+	                <th align="left">Tax/Fee</th>
+	                <th class="text-right">Amount</th>
+	                <th class="text-right">Discount</th>
+	                <th class="text-right">Surcharge</th>
+	                <th class="text-right">Interest</th>
+	                <th class="text-right">Total</th>
+	              </tr>
+	            </thead>
+	            <tbody>
+	              <tr>
+	                <td>#{k.lobname? k.lobname : ''}</td>
+	                <td>#{k.account}</td>
+	                <td align="right">#{k.amount.formatDecimal()}</td>
+	                <td align="right">#{k.discount.formatDecimal()}</td>
+	                <td align="right">#{k.surcharge.formatDecimal()}</td>
+	                <td align="right">#{k.interest.formatDecimal()}</td>
+	                <td align="right">#{k.total.formatDecimal()}</td>
+	              </tr>
+	            </tbody>
+	            <tfooter>
+	            	<tr>
+		            	<th align="left" colspan="3"><span style="color:red">Note:</span> 
+		                  THIS BILL IS VALID UNTIL &nbsp;
+		                  <label r:context="billing">#{bill.expirydate}</label>
+		                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		                  <label r:context="billing" r:visibleWhen="#{ bill.apptype == 'RENEW' }">Pay Until Qtr: #{qtr}</label>
+		                </th>
+		                <th class="text-right" colspan="2"> BILL AMOUNT :</th>
+		                <th class="text-right" colspan="2">P 
+		                  <label r:context="billing">#{bill.amount.formatDecimal()}</label>
+		                </th>
+              		</tr>
+	            </tfooter>
+	        </table>
+		</div>	   
+
+         
+	</div>
+	@wx:button( caption: 'Back', context:'billing', name: 'viewInitial' )
+	@wx:button( caption: 'Print Bill', context:'billing', name: 'printBill' )
+	@wx:button( caption: 'Pay Option', context:'billing', name: 'showPayOption', visibleWhen:'#{ bill.apptype == \'RENEW\' }' )
+	@wx:button( caption: 'Proceed for Payment', context:'billing', name: 'createPaymentOrder' )
+</div>
+
+<div class="modal fade" id="payOption" tabindex="-1" role="dialog" aria-labelledby="payOption" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+	  <div class="modal-content">
+	    <div class="modal-header">
+	      Select a Qtr	
+	      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	        <span aria-hidden="true">&times;</span>
+	      </button>
+	    </div>
+	    <div class="modal-body">
+	    	@wx:combo(caption:'Qtr', context:'billing', name:'qtr', attrs: [items:'qtrs'])
+	      <button r:context="billing" r:name="closeOption" class="submit">Close</button> 
+	      <button r:context="billing" r:name="recomputeBill" class="submit">OK</button> 
+	    </div>
+	  </div>
+	</div>
+</div>
+

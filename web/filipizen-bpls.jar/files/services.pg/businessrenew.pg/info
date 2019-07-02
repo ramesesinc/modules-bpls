@@ -1,6 +1,4 @@
 {
-	title  : 'Business Online Renewal',
-	menu: 'Business Renewal',
+	title  : 'Business Renewal',
 	sortorder: 2,
-	fragment:true
 }

@@ -90,7 +90,7 @@
           }
           else {
             var refno = o.result.objid;
-            WindowUtil.load( "/partners/${PARAMS.name}/paymentorder", {refno: refno});          
+            WindowUtil.load( "/epayment/paymentorder", {refno: refno});          
           }  
       });
     }
@@ -251,6 +251,26 @@
   </div>
 
 </div>
+
+ <tfooter>
+              <tr>
+                
+                <th align="left" colspan="3"><span style="color:red">Note:</span> 
+                  THIS BILL IS VALID UNTIL &nbsp;
+                  <span r:context="viewbill" r:type="label">#{formatDate(bill.expirydate).toUpperCase()}</span>
+                </th>
+                <th class="text-right" colspan="2"> BILL AMOUNT :</th>
+                <th class="text-right" colspan="2">P 
+                  <span r:context="viewbill" r:type="label">#{bill.amount.formatDecimal()}</span>
+                </th>
+              </tr>
+              <tr>
+                <th align="left" colspan="7">
+                  BILL PERIOD : &nbsp;&nbsp;&nbsp; 
+                  <span r:context="viewbill" r:type="label">Qtr #{qtr}</span>
+                </th> 
+              </tr> 
+            </tfooter>
 
   
 <script>JsBarcode("#barcode", "${barcode}");</script> 
