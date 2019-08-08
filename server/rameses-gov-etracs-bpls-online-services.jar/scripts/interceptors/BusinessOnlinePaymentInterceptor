@@ -107,6 +107,7 @@ class BusinessOnlinePaymentInterceptor {
 		m.email = (biz.email) ? biz.email : biz.owner.email;
 		m.phoneno = (biz.phoneno) ? biz.phoneno : biz.owner.phoneno;
 		o.info = m;
+
 	}
 
 	@Before(pattern="EORService.post", eval="#{args[0].txntype=='bpls'}")

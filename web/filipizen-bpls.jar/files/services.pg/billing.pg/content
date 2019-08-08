@@ -1,33 +1,7 @@
-<style type="text/css">
-.fade.in {
-    background: #00000030;
-}
-.close {
-    line-height: .6;
-}
-#barcode {
-    float: right;
-    height:80px;
-}
-
-@media print {
-  .navbar-inverse{display:none}
-  .footer{display:none}
-  .no-print{display:none}
-  .print{margin:30px}
-  .left{float:left}
-  .right{right}
-  #blackbar{display:none}
-  #Header, #Footer { display: none ! important; }
-  @page {size: auto;margin: 0mm;}
-}
-@media screen{
-  #barcode{display:none;}
-}
-.caption-class { width:200px; }
-</style>
-
+<link href="/res/bpls/billing.css" type="text/css" rel="stylesheet" />
 <script>
+	\$register(  {id: 'selectqtr', context: 'selectqtr', page: '/bpls/fragments/selectqtr' }  );
+
 	\$put( "billing", new function() {
 		var self = this;
 		this.error;
@@ -39,27 +13,32 @@
 		this.payorderdetails;
 		this.orgcode = "${PARAMS.info.id}";    	
 		this.lgu = {title:"${PARAMS.info.title}", group: "${PARAMS.info.group.title}"};
-		this.qtrs;
 		this.txntype = "bpls";
 
 		var svc = Service.lookup(self.orgcode + ":EPaymentService");
 
 		this.loadBill = function() {
 			var params = {refno: this.refno, txntype: this.txntype, showdetails:true };
-			if(this.qtr) params.qtr = this.qtr;
+			if(!this.qtr) this.qtr = 4;
+			params.qtr = this.qtr;
 			svc.getBilling( params, function(o,s) {
 				if( s == "error" ) {
 					self.error = o.result;
+					self._controller.refresh();
 				}
 				else {
 					self.error = null;
 					self.mode = "viewbill";
-					self.payorderdetails = o.result;
-					self.bill = o.result.info;
-					self.bill.amount = o.result.amount;
+					self.bill = o.result.info;					
 					self.barcode = "51001:"+self.bill.billno; 					
+					self.bill.amount = o.result.amount;
+					self.bill.qtr = self.qtr;
+					self.payorderdetails = o.result;					
+					if( self.bill.amount == 0 ) {
+						self.bill.items = [];	
+					}
+					self._controller.refresh();
 				}
-				self._controller.refresh();
 			});
 		}
 
@@ -67,23 +46,17 @@
 			self.mode = "initial";
 		}
 
-		this.recomputeBill = function() {
-			this.loadBill();
-			\$('#payOption').modal('hide');
-		}
-
-		this.closeOption = function() {
-			\$('#payOption').modal('hide');
-		}
-
 		this.showPayOption = function() {
-			\$('#payOption').modal('show');
+			var h = function(c) {
+				self.qtr = c.qtr;
+				self.loadBill();
+			}
+			return new PopupOpener( "selectqtr", {handler:h, qtr: this.qtr }, {title:'Pay Option', width:200}  )
 		}
 
 		this.onload = function() {
 			this.refno = WindowUtil.getParameter("refno");
 			this.qtr = WindowUtil.getParameter("qtr");
-			this.qtrs = [4,3,2,1];
 			if(this.refno) {
 				this.loadBill(); 
 			}
@@ -125,7 +98,7 @@
 
 <div r:context="billing" r:visibleWhen="#{mode == 'initial'}" style="display:none;">
 	<div class="form">
-	  @wx:text(caption:'BIN or Application No', context:'billing', name:'refno')
+	  @wx:text(caption:'BIN or Application No', context:'billing', name:'refno', inputClass:'searchtext')
 	</div>
 	@wx:button( caption:'Submit', context:'billing', name:'loadBill')
 </div>
@@ -147,27 +120,27 @@
 			@wx:label(caption:'Business Address', context:'billing', expr:'#{bill.address}')
 		</div>
 		<div>	
-			<table class="table" r:context="billing" r:items="bill.items" r:name="selectedItem" r:varName="k" r:varStatus="stat">
+			<table class="table tablebilling" r:context="billing" r:items="bill.items" r:name="selectedItem" r:varName="k" r:varStatus="stat">
 	            <thead>
 	              <tr>
-	                <th align="left">Line of Business</th>
-	                <th align="left">Tax/Fee</th>
-	                <th class="text-right">Amount</th>
-	                <th class="text-right">Discount</th>
-	                <th class="text-right">Surcharge</th>
-	                <th class="text-right">Interest</th>
-	                <th class="text-right">Total</th>
+	                <th align="left" class="lob">Line of Business</th>
+	                <th align="left" class="taxfee">Tax/Fee</th>
+	                <th class="billamount">Amount</th>
+	                <th class="billdiscount">Discount</th>
+	                <th class="billsurcharge">Surcharge</th>
+	                <th class="billinterest">Interest</th>
+	                <th class="billtotal">Total</th>
 	              </tr>
 	            </thead>
 	            <tbody>
 	              <tr>
-	                <td>#{k.lobname? k.lobname : ''}</td>
-	                <td>#{k.account}</td>
-	                <td align="right">#{k.amount.formatDecimal()}</td>
-	                <td align="right">#{k.discount.formatDecimal()}</td>
-	                <td align="right">#{k.surcharge.formatDecimal()}</td>
-	                <td align="right">#{k.interest.formatDecimal()}</td>
-	                <td align="right">#{k.total.formatDecimal()}</td>
+	                <td class="lob">#{k.lobname? k.lobname : ''}</td>
+	                <td class="taxfee">#{k.account}</td>
+	                <td class="billamount">#{k.amount.formatDecimal()}</td>
+	                <td class="billdiscount">#{k.discount.formatDecimal()}</td>
+	                <td class="billsurcharge">#{k.surcharge.formatDecimal()}</td>
+	                <td class="billinterest">#{k.interest.formatDecimal()}</td>
+	                <td class="billtotal">#{k.total.formatDecimal()}</td>
 	              </tr>
 	            </tbody>
 	            <tfooter>
@@ -176,7 +149,7 @@
 		                  THIS BILL IS VALID UNTIL &nbsp;
 		                  <label r:context="billing">#{bill.expirydate}</label>
 		                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		                  <label r:context="billing" r:visibleWhen="#{ bill.apptype == 'RENEW' }">Pay Until Qtr: #{qtr}</label>
+		                  <label r:context="billing" r:visibleWhen="#{ bill.apptype == 'RENEW' }">Pay Until Qtr: #{bill.qtr}</label>
 		                </th>
 		                <th class="text-right" colspan="2"> BILL AMOUNT :</th>
 		                <th class="text-right" colspan="2">P 
@@ -190,26 +163,8 @@
          
 	</div>
 	@wx:button( caption: 'Back', context:'billing', name: 'viewInitial' )
-	@wx:button( caption: 'Print Bill', context:'billing', name: 'printBill' )
+	@wx:button( caption: 'Print Bill', context:'billing', name: 'printBill', visibleWhen:'#{ bill.amount > 0}' )
 	@wx:button( caption: 'Pay Option', context:'billing', name: 'showPayOption', visibleWhen:'#{ bill.apptype == \'RENEW\' }' )
-	@wx:button( caption: 'Proceed for Payment', context:'billing', name: 'createPaymentOrder' )
-</div>
-
-<div class="modal fade" id="payOption" tabindex="-1" role="dialog" aria-labelledby="payOption" aria-hidden="true">
-	<div class="modal-dialog" role="document">
-	  <div class="modal-content">
-	    <div class="modal-header">
-	      Select a Qtr	
-	      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-	        <span aria-hidden="true">&times;</span>
-	      </button>
-	    </div>
-	    <div class="modal-body">
-	    	@wx:combo(caption:'Qtr', context:'billing', name:'qtr', attrs: [items:'qtrs'])
-	      <button r:context="billing" r:name="closeOption" class="submit">Close</button> 
-	      <button r:context="billing" r:name="recomputeBill" class="submit">OK</button> 
-	    </div>
-	  </div>
-	</div>
+	@wx:button( caption: 'Proceed for Payment', context:'billing', name: 'createPaymentOrder', visibleWhen:'#{ bill.amount > 0}' )
 </div>
 
