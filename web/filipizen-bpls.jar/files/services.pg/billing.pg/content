@@ -4,6 +4,7 @@
 
 	\$put( "billing", new function() {
 		var self = this;
+
 		this.error;
 		this.mode;
 		this.bill;
@@ -18,27 +19,28 @@
 		var svc = Service.lookup(self.orgcode + ":EPaymentService");
 
 		this.loadBill = function() {
+			this.refno = this.refno.trim();
 			var params = {refno: this.refno, txntype: this.txntype, showdetails:true };
 			if(!this.qtr) this.qtr = 4;
 			params.qtr = this.qtr;
-			svc.getBilling( params, function(o,s) {
-				if( s == "error" ) {
-					self.error = o.result;
-					self._controller.refresh();
+			return svc.getBilling( params, function(s,o) {
+				if( s.status == "ERROR" ) {
+					self.error = s.msg;
 				}
 				else {
 					self.error = null;
 					self.mode = "viewbill";
-					self.bill = o.result.info;					
+					self.bill = o.info;					
 					self.barcode = "51001:"+self.bill.billno; 					
-					self.bill.amount = o.result.amount;
+					self.bill.amount = o.amount;
 					self.bill.qtr = self.qtr;
-					self.payorderdetails = o.result;					
+					self.payorderdetails = o;					
 					if( self.bill.amount == 0 ) {
 						self.bill.items = [];	
 					}
-					self._controller.refresh();
 				}
+				console.log("fired after load business billing")
+				self._controller.refresh();				
 			});
 		}
 
@@ -77,12 +79,12 @@
 		    pp.origin = "filipizen";
 		    pp.txntype = this.txntype;
 		    if(this.qtr) pp.qtr = this.qtr;
-		    svc.createPaymentOrder( pp, function(o,s) {
-		        if( s == "error" ) {
-		          alert("error " + o.result );
+		    return svc.createPaymentOrder( pp, function(s,o) {
+		        if( s.status == "ERROR" ) {
+		          alert("error " + s.msg );
 		        }
 		        else {
-		          var refno = o.result.objid;
+		          var refno = o.objid;
 		          WindowUtil.load( "/epayment/paymentorder", {refno: refno});          
 		        }  
 		    });
