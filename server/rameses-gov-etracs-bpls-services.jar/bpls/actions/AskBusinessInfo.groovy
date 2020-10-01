@@ -2,32 +2,29 @@ package bpls.actions;
 
 import com.rameses.rules.common.*;
 import bpls.facts.*;
-import enterprise.actions.*;
 
-public class AskBusinessInfo extends AskInfo {
+public class AskBusinessInfo extends AbstractBusinessInfoAction implements RuleActionHandler {
 
-	//overridable. Key normally is the name
-	public def createKeyFinder( def infoName, def params ) {
-		return { o-> 
-			def lobid = params.lob?.objid;
-			if( lobid ) {
-				return ( o.lob?.objid == lobid && o.name == infoName  );
-			}
-			else {
-				return o.name == infoName;
-			}
-		};		
-	}
+	def request;
 
 	public void execute(def params, def drools) {
-		if(!params.attribute) {
-			throw new Exception("Please specify an attribute");	
+		def lob = params.lob;
+		def attrid = params.attribute.key;
+		
+		def entity = request.entity;
+		def newinfos = request.newinfos;
+
+		def val = params.defaultvalue;
+
+		if(!val || val == "null") {
+			val = null;
 		}
-		params.name = params.attribute;
-		if(params.defaultvalue) {
-			params.value =  params.defaultvalue;
-		}	
-		super.execute( params, drools );
+		else if( val instanceof String ) {
+			val = new ActionExpression( val, [:] );	
+		}
+
+		def info = getInfo( entity, newinfos, lob, attrid, val, request.phase );
+		if ( info ) info.defaultvalue = info.value; 
 	}
 
 }

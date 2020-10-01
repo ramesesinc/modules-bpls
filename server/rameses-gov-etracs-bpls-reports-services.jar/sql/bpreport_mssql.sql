@@ -102,17 +102,24 @@ select top ${topsize}
 		order by version desc 
 	) as permitno 
 from ( 
-	select  
-		ba.business_objid as businessid, ba.appyear, sum(decimalvalue) as amount 
-	from business_application ba 
-		inner join business_application_info bai on bai.applicationid=ba.objid 
-		inner join lob on lob.objid=bai.lob_objid 
-		inner join business b on b.objid=ba.business_objid 
-	where ba.appyear=$P{year} and ba.state in ('COMPLETED','RELEASE','PAYMENT') 
-		and (select count(*) from business_payment where applicationid=ba.objid and voided=0)>0  
-		and bai.attribute_objid in ('CAPITAL','GROSS')  
-		${filter} 
-	group by ba.business_objid, ba.appyear 
+	select businessid, appyear, sum(amount) as amount, sum(paymentcount) as paymentcount 
+	from ( 
+		select  
+			ba.business_objid as businessid, ba.appyear, decimalvalue as amount, 
+			(select count(objid) from business_payment where applicationid = ba.objid and voided = 0) as paymentcount 
+		from business_application ba 
+			inner join business b on b.objid = ba.business_objid 
+			inner join business_application_info bai on bai.applicationid = ba.objid 
+			inner join lob on lob.objid = bai.lob_objid 
+		where ba.appyear = $P{year} 
+			and b.permittype = $P{permittypeid} 
+			and ba.state in ( ${appstatefilter} ) 
+			and ba.apptype in ( ${apptypefilter} ) 
+			and bai.attribute_objid in ('CAPITAL','GROSS') 
+			and lob.classification_objid like $P{classificationid} 
+	)t0 
+	where 1=1 ${filter} 
+	group by businessid, appyear 
 )xx 
 	inner join business b on b.objid=xx.businessid 
 order by xx.amount desc, b.tradename  
@@ -278,7 +285,7 @@ from (
 			inner join business_receivable br on br.applicationid = ba.objid 
 		where p.refdate >= $P{startdate} 
 			and p.refdate <  $P{enddate} 
-			and p.voided = 0 ${filter} 
+			and p.voided = 0 ${filter} ${taxfeetypefilter} 
 		group by b.objid, ba.objid 
 	)tt1  
 		inner join business_receivable br on br.applicationid = tt1.applicationid 
@@ -320,10 +327,16 @@ select
 	tmp2.numfemale, tmp2.nummale, tmp2.numresident, tmp2.numemployee, 
 	(case when ei.gender='M' then 1 else 0 end) as malecount,
 	(case when ei.gender='F' then 1 else 0 end) as femalecount,  
-	case 
-		when b.orgtype='SING' then (select tin from entityindividual WHERE objid=b.owner_objid) 
-		else (select tin FROM entityjuridical WHERE objid=b.owner_objid) 
-	end as tin, '' as sss, 
+	(
+		select top 1 idno from entityid 
+		where entityid = b.owner_objid and idtype='TIN' 
+		order by dtissued desc 
+	) as tin, 
+	(
+		select top 1 idno from entityid 
+		where entityid = b.owner_objid and idtype='SSS' 
+		order by dtissued desc 
+	) as sss, 
 	case 
 		when b.state='ACTIVE' then (
 			select top 1 permitno from business_permit 
@@ -375,26 +388,33 @@ ORDER BY a.appyear, b.owner_name
 
 [getBPTaxFeeTopList]
 select top ${topsize} 
-	businessid, appyear, tradename, businessaddress, ownername, owneraddress, 
-	sum(tax) as tax, sum(regfee) as regfee, sum(othercharge) as othercharge,
-	sum(tax + regfee + othercharge) as total, 
-	(
+	xx.*, ( 
 		select top 1 permitno from business_permit 
-		where businessid=xx.businessid and activeyear=xx.appyear and state='ACTIVE' 
+		where businessid = xx.businessid and activeyear = xx.appyear and state='ACTIVE' 
 		order by version desc 
 	) as permitno 
 from ( 
 	select 
-		ba.business_objid as businessid, ba.appyear, ba.tradename, 
-		ba.businessaddress, ba.ownername, ba.owneraddress, 
-		(case when br.taxfeetype='TAX' then br.amount else 0.0 end) as tax, 
-		(case when br.taxfeetype='REGFEE' then br.amount else 0.0 end) as regfee,
-		(case when br.taxfeetype='OTHERCHARGE' then br.amount else 0.0 end) as othercharge 
-	from business_application ba  
-		inner join business b on ba.business_objid=b.objid 
-		inner join business_receivable br on br.applicationid=ba.objid 
-	where ba.appyear=$P{year} and ba.state in ('RELEASE','COMPLETED')  
-		and br.iyear=ba.appyear ${filter} 
+		businessid, appyear, tradename, businessaddress, ownername, owneraddress, 
+		sum(tax) as tax, sum(regfee) as regfee, sum(othercharge) as othercharge, 
+		(sum(tax) + sum(regfee) + sum(othercharge)) as total, sum(paymentcount) as paymentcount 
+	from ( 
+		select 
+			ba.business_objid as businessid, ba.appyear, ba.tradename, 
+			ba.businessaddress, ba.ownername, ba.owneraddress, 
+			(case when br.taxfeetype='TAX' then br.amount else 0.0 end) as tax, 
+			(case when br.taxfeetype='REGFEE' then br.amount else 0.0 end) as regfee, 
+			(case when br.taxfeetype='OTHERCHARGE' then br.amount else 0.0 end) as othercharge, 
+			(select count(objid) from business_payment where applicationid = ba.objid and voided = 0) as paymentcount 
+		from business_application ba  
+			inner join business b on b.objid = ba.business_objid 
+			inner join business_receivable br on br.applicationid = ba.objid 
+		where ba.appyear = $P{year} 
+			and b.permittype = $P{permittypeid} 
+			and ba.state in ( ${appstatefilter} ) 
+			and ba.apptype in ( ${apptypefilter} ) 
+	)t0 
+	where 1=1 ${filter} 
+	group by businessid, appyear, tradename, businessaddress, ownername, owneraddress 
 )xx 
-group by businessid, appyear, tradename, businessaddress, ownername, owneraddress 
-order by sum(tax + regfee + othercharge) desc, tradename 
+order by total desc, tradename 

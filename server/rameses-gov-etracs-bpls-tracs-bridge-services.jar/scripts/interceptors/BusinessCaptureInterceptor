@@ -29,21 +29,24 @@ class BusinessCaptureInterceptor {
 		def parms = evt.args[0];
 		def result = evt.result;
 		def sb = new StringBuilder();
-		if( parms.tradename ) {
+		if ( parms.tradename ) {
+			parms.tradename = parms.tradename.toString() +'%'; 
 			sb.append( ''' AND  i.tradename LIKE $P{tradename} ''' );
 		}
-		if(parms.ownername) {
+		if ( parms.ownername ) {
+			parms.ownername = parms.ownername.toString() +'%'; 
 			sb.append( ''' AND  i.ownername LIKE $P{ownername} ''' );	
 		}	
 
-		if( parms.activeyear ) {
+		if ( parms.activeyear ) {
 			sb.append( ''' AND  i.activeyear=$P{activeyear} ''' );	
 		}
 
 		if( sb.toString().length() == 0 ) {
 			sb.append( ''' AND 1=2 ''' );
-		}	
+		} 
 		parms.filter = sb.toString();
+		parms._limit = parms._rowsize = 100; 
 		def slist = em.getList( parms );
 		result.addAll( slist );
 	}
@@ -52,7 +55,15 @@ class BusinessCaptureInterceptor {
 	public def getInfo(def evt) {
 		def p = evt.args[0];
 		def result = evt.result;
-		result.putAll( em.getInfo([ objid: p.objid ]) );
+		def infos = em.getInfo([ objid: p.objid ]);
+		if ( infos instanceof List && infos.size() > 0 ) { 
+		   result.putAll( infos.first() ); 
+		} 
+		else {
+		   result.putAll( infos );
+		}
+		
+
 		result.lobs = em.getLobs([ objid: result.applicationid ]);
 	} 
 
@@ -70,6 +81,8 @@ class BusinessCaptureInterceptor {
 		em.create([ oldbusinessid: r.oldbusinessid, businessid:result.business.objid ], "business" );
 
 		r.lobs.each { 
+			if ( !it.oldlobid ) return; 
+
 			def o = [ 
 				oldlob_objid: it.oldlobid, 
 				oldlob: [objid: it.oldlobid, name:it.oldname], 
@@ -81,6 +94,8 @@ class BusinessCaptureInterceptor {
 		} 
 
 		r.taxfees.each { 
+			if ( it.oldaccount?.objid) return;
+			
 			def tf = [ 
 				oldaccount_objid: it.oldaccount.objid, oldaccount: it.oldaccount, 
 				account: [ objid: it.account.objid,  title: it.account.title ] 

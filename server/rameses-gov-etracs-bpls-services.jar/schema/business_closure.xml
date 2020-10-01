@@ -1,14 +1,12 @@
-<schema adapter="bplsdb">
+<schema>
 	<element tablename="business_closure">
-		<field name="objid" primary="true" prefix="BCLOS"/>
-		<field name="controlno" required="true" />
-		<field name="businessyearid" required="true" />
-		<field name="geninfoid" required="true" />
-		<field name="dtissued" required="true" />
-		<field name="dtcreated" required="true" />
-		<field name="dtcreatedby_objid"  />
-		<field name="dtcreatedby_name"  />
-		<field name="remarks"  />
-		<field name="appid"  />
+		<field name="objid" primary="true"/> 
+		<field name="businessid" required="true"/> 
+		<field name="dtcreated" required="true"/> 
+		<field name="createdby_objid" required="true"/> 
+		<field name="createdby_name" required="true"/> 
+		<field name="dtceased" required="true"/> 
+		<field name="dtissued" required="true"/> 
+		<field name="remarks"/> 
 	</element>
 </schema>

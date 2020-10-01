@@ -1,8 +1,0 @@
-<schema adapter="bplsdb">
-	<element tablename="business_application_lob_retired">
-		<field name="objid" primary="true" prefix="BAPPLOBRET"/>
-		<field name="appid" />
-		<field name="businesslobid" required="true"/>
-		<field name="particulars" required="true"/>
-	</element>
-</schema>

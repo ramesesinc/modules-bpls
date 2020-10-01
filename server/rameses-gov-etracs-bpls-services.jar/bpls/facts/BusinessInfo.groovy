@@ -1,54 +1,47 @@
 package bpls.facts;
 
-import  enterprise.facts.*;
-
-public class BusinessInfo extends VariableInfo {
+public class BusinessInfo {
     
     BPApplication application;
+    String objid;
     LOB	lob;
+    String name;
+    String stringvalue;
+    int intvalue;
+    boolean booleanvalue;
+    double decimalvalue;
     int year;   //this is for late renewal support
     int qtr;    //this is for qtr support for LGUs who report qtr gross for new business.
-    def handler; //this is just dummy so it will not produce an error
-    def value;
-
-    public int hashCode() {
-        def buff = new StringBuilder();
-        if( lob?.objid !=null ) {
-            buff.append( lob.objid + "-" );
-        }
-        buff.append( name );
-        return buff.toString().hashCode();
+    
+    /** Creates a new instance of BusinessInfo */
+    public BusinessInfo() {
     }
     
-    public def toMap() {
-        def m = super.toMap();
-        if( lob ) {
-            m.lob = lob.toMap();
-            //this is for the info below
-            m.category = lob.name;
-            m.sortorder = 1000 + m.sortorder;
+    public BusinessInfo(String datatype, Object value) {
+        if(value == null) return;
+        datatype = datatype.toLowerCase();
+        if( datatype.equals("decimal") ) {
+            setDecimalvalue( Double.parseDouble(value+"") );
         }
-        return m;
-    }    
-
-    public void setValue( def d ) {
-        if(datatype==null) throw new Exception("datatype must not be null");
-        this.value = d;
-        if(datatype == "decimal") {
-            decimalvalue = d;
-        }   
-        else if(datatype=="integer") {
-            intvalue = d;
-        }   
-        else if(datatype=="boolean") {
-            booleanvalue = d;
-        }   
-        else if(datatype == "date" ) {
-            datevalue = d;
-        }   
-        else {
-            stringvalue = d;
-        }   
+        else if(datatype.equals("integer")) {
+            setIntvalue( Integer.parseInt(value+"") );
+        }
+        else if( datatype.equals("boolean")) {
+            String v = value.toString().toLowerCase().trim();
+            if(v.equals("1") || v.equals("true")) {
+                v = "true";
+            }
+            else {
+                v = "false";
+            }
+            setBooleanvalue( Boolean.parseBoolean(v));
+        }
+        else if(datatype.startsWith("string")) {
+            setStringvalue( (String)value );
+        } 
+        
     }
-
+    
+    
+    
 }

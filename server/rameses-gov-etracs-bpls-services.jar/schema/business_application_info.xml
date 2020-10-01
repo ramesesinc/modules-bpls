@@ -1,18 +1,21 @@
-<schema adapter="bplsdb">
+<schema>
 	
 	<element tablename="business_application_info">
-		<field name="objid" primary="true" prefix="BAPPINFO"/>
-		<field name="appid" required="true"/>
-		<field name="datatype" required="true"/>
-		<field name="name" required="true"/>
-		<field name="lobid"/>
-		<field name="decimalvalue" type="decimal"/>
-		<field name="intvalue" type="integer"/>
-		<field name="stringvalue" />
-		<field name="datevalue" type="date"/>
-		<field name="booleanvalue" type="boolean"/>
+		<field name="objid" primary="true"/>
+		<field name="businessid" required="true"/>
+		<field name="applicationid" required="true"/>
 		<field name="type" required="true"/>
-		<field name="level"/>
-	</element>
+		<field name="activeyear" required="true"/>
+		<field name="attribute_objid" required="true"/>
+		<field name="attribute_name" required="true"/>
+		<field name="lob_objid" />
+		<field name="lob_name" />
+		<field name="decimalvalue" />
+		<field name="intvalue" />
+		<field name="stringvalue" />
+		<field name="boolvalue" />
+		<field name="phase" />
+		<field name="level" />
+	</element>	
 
 </schema>
