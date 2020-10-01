@@ -60,7 +60,9 @@ class OnlineBusinessBillingService {
 			bin: z.app.business.bin, 
 			appdate:z.app.dtfiled, 
 			apptype: z.app.apptype,
-			expirydate:z.expirydate
+			expirydate:z.expirydate, 
+			email: z.app.business.email,
+			mobileno: z.app.business.mobileno
 		];
 		if( o.showdetails ) {
 			p.info.items = z.taxfees.collect{[ 
