@@ -11,7 +11,9 @@ public class OnlineBusinessBillingService {
 
 	@ProxyMethod
 	public def getBilling( data ) { 
-		return bplsSvc.getBilling( data );
+		def biz = bplsSvc.getBilling( data );
+		println biz.info.email;
+		return biz;
 	}
 
 }
