@@ -23,6 +23,7 @@ const reducer = (draft, action) => {
       return;
   }
 }
+
 import InitialInfo from "./InitialInfo";
 import Payment from "./Payment";
 

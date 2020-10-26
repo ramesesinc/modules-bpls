@@ -1,0 +1,10 @@
+.EditInfo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-left: 20px;
+}
+
+.EditInfo__item {
+    flex-basis: 120px;
+}
