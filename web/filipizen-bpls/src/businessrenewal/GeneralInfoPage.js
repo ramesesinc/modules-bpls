@@ -14,7 +14,6 @@ import {
   useData,
 } from "rsi-react-web-components";
 import "rsi-react-web-components/dist/index.css";
-import { isBlur } from "rsi-react-filipizen-components";
 
 import LobList from "./components/LobList";
 
@@ -35,7 +34,7 @@ const GeneralInfoPage = ({
 
   useEffect(() => {
     setLoading(true);
-    appService.getApplication({objid: app.objid}, (err, app) => {
+    appService.invoke("getApplication", {objid: app.objid}, (err, app) => {
       if (!err) {
         setApp(app);
       } else {

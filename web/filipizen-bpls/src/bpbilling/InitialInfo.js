@@ -29,8 +29,8 @@ const InitialInfo = ({
 
   const getBilling = async () => {
     const params = {txntype, refno, qtr: 4, showdetails:true};
-    const svc = await Service.lookupAsync(`${partner.id}:OnlineBusinessBillingService`);
-    return await svc.getBilling(params)
+    const svc = Service.lookupAsync(`${partner.id}:OnlineBusinessBillingService`, "bpls");
+    return await svc.invoke("getBilling", params);
   }  
 
   const loadBill = () => {

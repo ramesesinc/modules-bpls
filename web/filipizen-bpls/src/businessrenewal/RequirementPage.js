@@ -6,7 +6,6 @@ import {
   Button,
   ActionBar,
   BackLink,
-  Spacer,
   Title,
   Label,
   Subtitle,
@@ -51,7 +50,7 @@ const RequirementPage = ({
 
   useEffect(() => {
     setLoading(true);
-    appService.getRequirements(app, (err, requirements) => {
+    appService.invoke("getRequirements", app, (err, requirements) => {
       if (!err) {
         setRequirements(requirements);
       } else {

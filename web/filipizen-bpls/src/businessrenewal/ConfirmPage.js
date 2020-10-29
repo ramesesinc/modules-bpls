@@ -34,7 +34,7 @@ const ConfirmPage = ({
 
   useEffect(() => {
     setLoading(true);
-    appService.getApplication({objid: app.objid}, (err, app) => {
+    appService.invoke("getApplication", {objid: app.objid}, (err, app) => {
       if (!err) {
         setApp(app);
       } else {
@@ -45,7 +45,7 @@ const ConfirmPage = ({
   }, [])
 
   const submit = () => {
-    appService.submit(app, (err, app) => {
+    appService.invoke("submit", app, (err, app) => {
       if (!err) {
         moveNextStep();
       } else {

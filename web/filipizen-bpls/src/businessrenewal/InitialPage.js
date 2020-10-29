@@ -13,8 +13,7 @@ import {
   Subtitle,
   Table,
   TableColumn,
-  useData,
-  ErrorOutlineIcon
+  useData
 } from "rsi-react-web-components";
 
 import { ACTIONS } from "./reducer"
@@ -72,7 +71,7 @@ const InitialPage = ({
   };
 
   const saveApp = () => {
-    appService.create({app}, (err, app) => {
+    appService.invoke("create", {app}, (err, app) => {
       if (!err) {
         app.lobs = [];
         app.infos = [];
@@ -88,7 +87,7 @@ const InitialPage = ({
 
   const validateBin = () => {
     setLoading(true);
-    appService.validateBin({ bin }, (err, data) => {
+    appService.invoke("validateBin", { bin }, (err, data) => {
       if (!err) {
         setKey(data.key)
         setEmail(data.email)
@@ -111,7 +110,7 @@ const InitialPage = ({
 
   const verifyApplication = () => {
     setLoading(true);
-    appService.verifyApplication({ bin }, (err, app) => {
+    appService.invoke("verifyApplication", { bin }, (err, app) => {
       if (!err) {
         let idx;
         if (app.redflags.length == 0) {

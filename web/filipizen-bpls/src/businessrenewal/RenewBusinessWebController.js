@@ -4,7 +4,6 @@ import {
   Service,
   Stepper,
   Content,
-  getUrlParameter,
   Page,
   StateProvider,
 } from "rsi-react-web-components";
@@ -64,7 +63,7 @@ const RenewBusinessWebController = ({
     history,
     moveNextStep,
     movePrevStep,
-    appService: Service.lookup(`${partner.id}:OnlineBusinessRenewalService`),
+    appService: Service.lookup(`${partner.id}:OnlineBusinessRenewalService`, "bpls"),
     stepCompleted: step < app.step,
     title: "Business Renewal Application",
   };

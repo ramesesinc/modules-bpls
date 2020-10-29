@@ -33,7 +33,7 @@ const EditInfoPage = ({
 
   useEffect(() => {
     setLoading(true);
-    appService.getInfos(app, (err, app) => {
+    appService.invoke("getInfos", app, (err, app) => {
       if (!err) {
         setApp(app);
       } else {
@@ -43,22 +43,11 @@ const EditInfoPage = ({
     });
   }, [])
 
-  const saveInfos = (app) => {
-    const infos = {objid: app.objid, infos: app.infos};
-    appService.saveInfos(infos, (err, res) => {
-      if (!err) {
-        moveNextStep();
-      } else {
-        setError(err);
-      }
-    });
-  }
-
   const submitInfo = () => {
     setError(null);
     setLoading(true);
     const infos = {objid: app.objid, infos: app.infos};
-    appService.saveInfos(infos, (err, res) => {
+    appService.invoke("saveInfos", infos, (err, res) => {
       if (!err) {
         moveNextStep();
       } else {
