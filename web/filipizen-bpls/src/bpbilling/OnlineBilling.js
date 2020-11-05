@@ -47,9 +47,9 @@ const OnlineBilling = ({
   const loadBill = () => {
     setLoading(true);
     setError(null);
-      getBilling().then(bill => {
-        console.log("BILL RECEIVED", bill);
-        bill.qtr = qtr;
+      getBilling().then(data => {
+        const bill = data.info;
+        bill.qtr = 4;
         if (bill.amount == 0) {
           bill.items = [];
         }

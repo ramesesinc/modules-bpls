@@ -62,7 +62,8 @@ class OnlineBusinessBillingService {
 			apptype: z.app.apptype,
 			expirydate:z.expirydate, 
 			email: z.app.business.email,
-			mobileno: z.app.business.mobileno
+			mobileno: z.app.business.mobileno,
+			amount: z.amount,
 		];
 		if( o.showdetails ) {
 			p.info.items = z.taxfees.collect{[ 
@@ -97,13 +98,17 @@ class OnlineBusinessBillingService {
 	}
 
 	@ProxyMethod
-	public void postPayment(  def eor ) {
-		def o = eor.paymentorder;
-		o.reftype = 'eor';
-		o.receiptno = eor.receiptno; 
-		o.receiptdate = eor.receiptdate;
-		postPaymentSvc.postPayment( o ); 
+	public void postPayment(  def eor, def bill ) {
+		bill.reftype = 'eor';
+		bill.receiptno = eor.receiptno;
+		bill.receiptdate = eor.receiptdate;
+		postPaymentSvc.postPayment( bill ); 
 	}
+
+    @ProxyMethod
+	public def getEmailAttachments( eor ) {
+        return []
+    }
 
 
 }

@@ -36,7 +36,8 @@ const InitialInfo = ({
   const loadBill = () => {
     setLoading(true);
     setError(null);
-    getBilling().then(bill => {
+    getBilling().then(data => {
+      const bill = data.info;
       bill.qtr = 4;
       if (bill.amount == 0) {
         bill.items = [];

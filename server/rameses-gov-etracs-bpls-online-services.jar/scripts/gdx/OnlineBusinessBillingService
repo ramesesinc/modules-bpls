@@ -2,7 +2,7 @@ import com.rameses.annotations.*;
 
 public class OnlineBusinessBillingService {
 
-	@Service(value="OnlineBusinessBillingService", connection="bpls")
+	@Service(value="OnlineBusinessBillingService")
 	def bplsSvc;
 
 	@ProxyMethod
