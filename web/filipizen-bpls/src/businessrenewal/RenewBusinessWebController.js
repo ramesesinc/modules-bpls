@@ -11,6 +11,7 @@ import "rsi-react-web-components/dist/index.css";
 
 import reducer, { initialState } from "./reducer";
 
+import SelectTxnTypePage from "./SelectTxnTypePage.js";
 import InitialPage from "./InitialPage";
 import GeneralInfoPage from "./GeneralInfoPage";
 import EditInfoPage from "./EditInfoPage";
@@ -19,12 +20,13 @@ import ConfirmPage from "./ConfirmPage";
 import CompletedPage from "./CompletedPage";
 
 const pages = [
-  { step: 0, name: "initial", caption: "Initial", component: InitialPage },
-  { step: 1, name: "info", caption: "General Information", component: GeneralInfoPage },
-  { step: 2, name: "enter-info", caption: "Enter Information", component: EditInfoPage },
-  { step: 3, name: "requirements", caption: "Requirements", component: RequirementPage },
-  { step: 4, name: 'confirm', caption: 'Confirm', component: ConfirmPage },
-  { step: 5, name: 'completed', caption: 'Completed', component: CompletedPage },
+  { step: 0, name: "select", caption: "Initial", component: SelectTxnTypePage },
+  { step: 1, name: "initial", caption: "Initial", component: InitialPage },
+  { step: 2, name: "info", caption: "General Information", component: GeneralInfoPage },
+  { step: 3, name: "edit-info", caption: "Edit Information", component: EditInfoPage },
+  { step: 4, name: "requirements", caption: "Requirements", component: RequirementPage },
+  { step: 5, name: 'confirm', caption: 'Confirm', component: ConfirmPage },
+  { step: 6, name: 'completed', caption: 'Completed', component: CompletedPage },
 ];
 
 const RenewBusinessWebController = ({
@@ -32,14 +34,20 @@ const RenewBusinessWebController = ({
   service,
   location,
   history,
-  initialStep=0, //TODO: SET TO 0
+  initialStep=0
 }) => {
 
   const [step, setStep] = useState(initialStep);
-  const [app, setApp] = useState({});
-  
-  const moveNextStep = () => {
-    setStep(cs => cs+1);
+  const [app, setApp] = useState({step: 0});
+
+  const moveNextStep = (nextStep) => {
+    if (typeof(nextStep) === "number") {
+      setStep(nextStep);
+    } else {
+      nextStep = step+1;
+      setStep(cs => cs+1);
+    }
+    setApp({...app, step: nextStep});
   }
 
   const movePrevStep = () => {
@@ -51,11 +59,12 @@ const RenewBusinessWebController = ({
   }
 
   const handleStep = (step) => {
-    setStep(step);
+    setStep(step + 2);
   };
 
-  const page = pages[step];
+   const page = pages[step];
   const PageComponent = page.component;
+  
   const compProps = {
     partner,
     service,
@@ -71,12 +80,13 @@ const RenewBusinessWebController = ({
   return (
     <StateProvider initialState={initialState} reducer={reducer}>
       <Page>
-        {step > 0 && app.step < pages.length && (
+        {/** {step > 0 && app.step < pages.length && ( */}
+        {step > 1 && (
           <Panel target="left" style={styles.stepperContainer}>
             <Stepper
-              steps={pages}
-              completedStep={app.step}
-              activeStep={step}
+              steps={pages.filter(pg => pg.step > 1)}
+              completedStep={app.step - 1}
+              activeStep={step - 2}
               handleStep={handleStep}
             />
           </Panel>
@@ -87,6 +97,7 @@ const RenewBusinessWebController = ({
           </Panel>
         </Content>
       </Page>
+      }
     </StateProvider>
   );
 };

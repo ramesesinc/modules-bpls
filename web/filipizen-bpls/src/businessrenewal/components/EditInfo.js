@@ -1,14 +1,10 @@
 import React from 'react'
 import {
-  Checkbox,
-  Panel,
-  Label,
   Decimal,
   Integer,
 }
 from "rsi-react-web-components";
 import styles from "./EditInfo.css";
-
 
 const components = {
   "decimal": Decimal,

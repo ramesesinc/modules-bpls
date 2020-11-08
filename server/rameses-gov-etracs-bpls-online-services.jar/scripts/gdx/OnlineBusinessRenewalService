@@ -1,0 +1,111 @@
+import com.rameses.annotations.*;
+
+public class OnlineBusinessRenewalService {
+
+	// TODO: to be implemented in local-etracs
+	// @Service(value="OnlineBusinessRenewalService", connection="bpls")
+	// def bplsSvc;
+
+	@ProxyMethod
+	public def getApplication(params) {
+		return [
+			objid: '1234',
+			appno: 'B-0001',
+			bin: params.bin ? params.bin : "1234",
+			tradename: "MY SARI-SARI STORE",
+			businessaddress: "CEBU CITY",
+			owner: [name: "JUAN DELA CRUZ"],
+			renewalyear: 2021,
+			infos: [
+				[name: "numemp", caption: "No. of Employees", value: 2, datatype: "integer"],
+			],
+			lobs: [
+				[lob: [name: "SARI-SARI STORE"], prevgross: 120000.00],
+				[lob: [name: "RICE RETAILER"], prevgross: 230500.00],
+			]
+		]
+  }
+
+	/*=========================================================
+	* Checks if bin is valid, 
+	* if valid and has registered email
+	*			send otp to business email
+	*     return [key: otpkey, bin: bin, email: businessemail ]
+	* else 
+	*     throw error
+	=========================================================*/
+	@ProxyMethod
+  public def validateBin(app) {
+		return [key: '1234', email: "g@gmail.com", bin: app.bin]
+  }
+
+	/*=========================================================
+	* Verify the application for any redflags.
+	* 
+	=========================================================*/
+	@ProxyMethod
+  public def verifyApplication(app) {
+		app = getApplication(app)
+		if (app.bin == '1234') {
+			//test: no redflag bin
+			app.redflags = []
+			return app
+		}
+
+		//test: with redflag bin
+		app.redflags = [
+			[issue: "Non-conformance to file. No fire alarms.", office: "BFP"],
+			[issue: "Previous unpaid balance of P6,200.00", office: "CTO"],
+		]
+		return app;
+  }
+
+
+	@ProxyMethod
+  public def create(app) {
+    app.appno = 'B-0001';
+    return app;
+  }
+
+  /*========================================================
+  * Return the required business information
+  ========================================================*/
+	@ProxyMethod
+  public def getInfos(app) {
+		app = getApplication(app);
+		
+		app.infos = [
+			[name: "numemp", caption: "No. of Employees", value: 2, datatype: "integer"],
+		]
+
+		app.lobs = [
+				[lob: [name: "SARI-SARI STORE"], prevgross: 120000.00],
+				[lob: [name: "RICE RETAILER"], prevgross: 230500.00],
+			]
+		return app;		
+  }
+
+	/*==========================================
+	* save app with completed lobs and infos 
+	==========================================*/
+	@ProxyMethod
+	public def saveInfos(app) {
+		return app;
+	}
+
+	@ProxyMethod
+	public def getRequirements(app) {
+		return [
+			[objid: 'R1', caption: "ITR"],
+			// [objid: 'R2', caption: "DTR"],
+		]
+	}
+
+	/*==============================================
+	* Submit application for processing
+	==============================================*/
+	@ProxyMethod
+	public def submit(app) {
+		return getApplication(app);
+	}
+}

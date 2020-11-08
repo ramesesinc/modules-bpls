@@ -45,7 +45,6 @@ const InitialInfo = ({
       dispatch({type: "SET_BILL", refno: refno, bill: bill});
       moveNextStep();
     }).catch(err => {
-      console.log("ERR", err)
       setError(err.toString());
       setLoading(false)
     })

@@ -5,6 +5,7 @@ import {
   FormPanel,
   Panel,
   Button,
+  Error,
   ActionBar,
   BackLink,
   Spacer,
@@ -49,14 +50,10 @@ const InitialPage = ({
   const [loading, setLoading] = useState(false);
 
   const [agreeDisclaimer, setAgreeDisclaimer] = useState(false);
-  const [bin, setBin] = useState();
   const [app, setApp] = useState({});
   const [email, setEmail] = useState();
-  const [key, setKey] = useState();
   const [keyCode, setKeyCode] = useState();
 
-  //TODO: uncomment for production
-  // const [currentStep, setCurrentStep] = useState(0);
   const [currentStep, setCurrentStep] = useState(0);
   
 
@@ -70,27 +67,11 @@ const InitialPage = ({
     setCurrentStep((cs) => cs - 1);
   };
 
-  const saveApp = () => {
-    appService.invoke("create", {app}, (err, app) => {
-      if (!err) {
-        app.lobs = [];
-        app.infos = [];
-        app.redflags = [];
-        dispatch({type: ACTIONS.SET_APP, app});     
-        setApp(app);
-        moveNextStep();
-      } else {
-        setError(err);
-      }
-    });
-  };
-
   const validateBin = () => {
     setLoading(true);
-    appService.invoke("validateBin", { bin }, (err, data) => {
+    appService.invoke("validateBin", app, (err, validatedApp) => {
       if (!err) {
-        setKey(data.key)
-        setEmail(data.email)
+        setApp(validatedApp);
         moveNextStep()
       } else {
         setError(err);
@@ -101,7 +82,7 @@ const InitialPage = ({
 
   const verifyCode = () => {
     setError(null);
-    if (key !== keyCode) {
+    if (app.key !== keyCode) {
       setError("Code is incorrect");
     } else {
       verifyApplication()
@@ -110,20 +91,34 @@ const InitialPage = ({
 
   const verifyApplication = () => {
     setLoading(true);
-    appService.invoke("verifyApplication", { bin }, (err, app) => {
+    appService.invoke("openBin", app, (err, validatedApp) => {
       if (!err) {
         let idx;
-        if (app.redflags.length == 0) {
+        if (validatedApp.redflags.length == 0) {
           idx = steps.findIndex(step => step.name === "verify-info");
         } else {
           idx = steps.findIndex(step => step.name === "app-notice");
         }
-        setApp(app);
+        validatedApp.step = 1;
+        setApp(validatedApp);
         setCurrentStep(idx);
       } else {
         setError(err);
       }
       setLoading(false);
+    });
+  };
+
+  const saveApp = () => {
+    appService.invoke("create", app, (err, app) => {
+      if (!err) {
+        app.redflags = [];
+        dispatch({type: ACTIONS.SET_APP, app});     
+        setApp(app);
+        moveNextStep();
+      } else {
+        setError(err);
+      }
     });
   };
 
@@ -140,16 +135,17 @@ const InitialPage = ({
       <Card>
         <Spacer />
 
-        <Panel visibleWhen={step.name === "enter-bin"}>
+        <FormPanel context={app} handler={setApp} visibleWhen={step.name === "enter-bin"}>
           <Title>{title}</Title>
           <Subtitle>{step.caption}</Subtitle>
           <Spacer />
-          <Text caption="Enter BIN" value={bin} onChange={setBin} required={true} />
+          <Error msg={error} />
+          <Text caption="Enter BIN" name="bin" required={true} />
           <ActionBar>
             <BackLink caption="Cancel" action={() => history.goBack()} />
-            <Button caption="Next" action={validateBin} loading={loading} disableWhen={!bin} />
+            <Button caption="Next" action={validateBin} loading={loading} disableWhen={!app.bin} />
           </ActionBar>
-        </Panel>
+        </FormPanel>
 
         <Panel visibleWhen={step.name === "email-verification"}>
           <Title>{title}</Title>
@@ -185,7 +181,14 @@ const InitialPage = ({
           <Title>{title}</Title>
           <Subtitle>{step.caption}</Subtitle>
           <Spacer height={30} />
-          <Text caption="BIN" name="bin" readOnly={true} />
+          <Panel row>
+            <Text caption="BIN" name="bin" readOnly={true} />
+            <Text caption="Application No." name="prevapp.appno" readOnly={true} />
+          </Panel>
+          <Panel row>
+            <Text caption="Application Year" name="prevapp.appyear" readOnly={true} />
+            <Text caption="Application Type" name="prevapp.apptype" readOnly={true} />
+          </Panel>
           <Text caption="Trade Name" name="tradename" readOnly={true} />
           <Text caption="Owner Name" name="owner.name" readOnly={true} />
           <Text caption="Business Address" name="businessaddress" readOnly={true} />
@@ -209,11 +212,19 @@ const InitialPage = ({
           <Title>{title}</Title>
           <Subtitle>{step.caption}</Subtitle>
           <Spacer height={30} />
-          <Text caption="BIN" name="bin" readOnly={true} />
+          <Panel row>
+            <Text caption="BIN" name="bin" readOnly={true} />
+            <Text caption="Application No." name="prevapp.appno" readOnly={true} />
+          </Panel>
+          <Panel row>
+            <Text caption="Application Year" name="prevapp.appyear" readOnly={true} />
+            <Text caption="Application Type" name="prevapp.apptype" readOnly={true} />
+          </Panel>
           <Text caption="Trade Name" name="tradename" readOnly={true} />
           <Text caption="Owner Name" name="owner.name" readOnly={true} />
           <Text caption="Business Address" name="businessaddress" readOnly={true} />
           <Spacer />
+          <h3>Line of Businesses Operated</h3>
           <LobList lobs={app.lobs} />
           <ActionBar>
             <BackLink caption="Back" action={() => setCurrentStep(1)} />
@@ -234,7 +245,7 @@ const InitialPage = ({
 
         <Panel visibleWhen={step.name === "newapp"} width={400}>
           <Title>{title}</Title>
-          <TrackingInfo appno={app.appno} onContinue={exitInitial} />
+          <TrackingInfo appno={app.controlno} onContinue={exitInitial} />
         </Panel>
       </Card>
     )}

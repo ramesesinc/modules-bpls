@@ -15,12 +15,14 @@ import {
 } from "rsi-react-web-components";
 
 import EditInfo from "./components/EditInfo";
+import { ACTIONS } from "./reducer";
 
 const EditInfoPage = ({
   appService,
   moveNextStep,
   movePrevStep,
   title,
+  stepCompleted
 }) => {
   
   const [ctx, dispatch] = useData();
@@ -36,6 +38,7 @@ const EditInfoPage = ({
     appService.invoke("getInfos", app, (err, app) => {
       if (!err) {
         setApp(app);
+        dispatch({type: ACTIONS.SET_APP, app});
       } else {
         setError(err);
       }
@@ -46,7 +49,7 @@ const EditInfoPage = ({
   const submitInfo = () => {
     setError(null);
     setLoading(true);
-    const infos = {objid: app.objid, infos: app.infos};
+    const infos = {objid: app.objid, step: 4, lobs: app.lobs, infos: app.infos};
     appService.invoke("saveInfos", infos, (err, res) => {
       if (!err) {
         moveNextStep();
@@ -64,8 +67,17 @@ const EditInfoPage = ({
         <Title>{title}</Title>
         <Subtitle>Edit Information</Subtitle>
         <Spacer height={30} />
-        <Text caption="BIN" name="bin" readOnly={true} />
+        <Panel row>
+            <Text caption="BIN" name="bin" readOnly={true} />
+            <Text caption="Application No." name="prevapp.appno" readOnly={true} />
+          </Panel>
+          <Panel row>
+            <Text caption="Application Year" name="prevapp.appyear" readOnly={true} />
+            <Text caption="Application Type" name="prevapp.apptype" readOnly={true} />
+          </Panel>
         <Text caption="Trade Name" name="tradename" readOnly={true} />
+        <Text caption="Owner Name" name="owner.name" readOnly={true} />
+        <Text caption="Business Address" name="businessaddress" readOnly={true} />
         <Spacer />
         <h4>Business Information</h4>
         {app.infos.map((info, idx) => 
@@ -89,7 +101,7 @@ const EditInfoPage = ({
             caption={lob.lob.name}
           />
         )}
-        <ActionBar>
+        <ActionBar visibleWhen={!stepCompleted}>
           <BackLink caption="Back" action={() => setCurrentStep(1)} />
           <Button caption="Next" action={submitInfo} />
         </ActionBar>

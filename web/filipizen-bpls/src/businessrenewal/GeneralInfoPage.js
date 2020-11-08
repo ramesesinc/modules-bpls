@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import {
   Card,
   FormPanel,
+  Panel,
   Error,
   Button,
   ActionBar,
@@ -23,6 +24,7 @@ const GeneralInfoPage = ({
   movePrevStep,
   appService, 
   title,
+  stepCompleted
 }) => {
 
   const [ctx, dispatch] = useData();
@@ -34,7 +36,7 @@ const GeneralInfoPage = ({
 
   useEffect(() => {
     setLoading(true);
-    appService.invoke("getApplication", {objid: app.objid}, (err, app) => {
+    appService.invoke("getInfos", {objid: app.objid}, (err, app) => {
       if (!err) {
         setApp(app);
       } else {
@@ -51,7 +53,14 @@ const GeneralInfoPage = ({
         <Title>{title}</Title>
         <Subtitle>General Information</Subtitle>
         <Spacer height={30} />
-        <Text caption="BIN" name="bin" readOnly={true} />
+        <Panel row>
+          <Text caption="BIN" name="bin" readOnly={true} />
+          <Text caption="Application No." name="prevapp.appno" readOnly={true} />
+        </Panel>
+        <Panel row>
+          <Text caption="Application Year" name="prevapp.appyear" readOnly={true} />
+          <Text caption="Application Type" name="prevapp.apptype" readOnly={true} />
+        </Panel>
         <Text caption="Trade Name" name="tradename" readOnly={true} />
         <Text caption="Owner Name" name="owner.name" readOnly={true} />
         <Text caption="Business Address" name="businessaddress" readOnly={true} />
@@ -60,8 +69,8 @@ const GeneralInfoPage = ({
           <Label key={info.name} caption={info.caption} >{info.value}</Label>
         )}
         <Spacer />
-        <LobList lobs={app.lobs}  />
-        <ActionBar>
+        <LobList lobs={app.lobs} isPreviousInfo={false}  />
+        <ActionBar visibleWhen={!stepCompleted}>
           <BackLink caption="Back" action={movePrevStep} />
           <Button caption="Next" action={moveNextStep} />
         </ActionBar>
