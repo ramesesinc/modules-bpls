@@ -1,6 +1,6 @@
 {
   "name": "filipizen-bpls",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Filipizen BPLS Web Modules",
   "author": "ramesesinc",
   "license": "MIT",
@@ -27,8 +27,8 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.2.0",
-    "rsi-react-filipizen-components": "^0.2.0",
-    "rsi-react-web-components": "^0.2.0"
+    "rsi-react-filipizen-components": "^0.2.1",
+    "rsi-react-web-components": "^0.2.1"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.3",
@@ -52,8 +52,8 @@
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^3.4.1",
-    "rsi-react-filipizen-components": "^0.2.0",
-    "rsi-react-web-components": "^0.2.0"
+    "rsi-react-filipizen-components": "^0.2.1",
+    "rsi-react-web-components": "^0.2.1"
   },
   "files": [
     "dist"
