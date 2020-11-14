@@ -1,0 +1,50 @@
+import com.rameses.annotations.*;
+
+class BusinessApplicationWorkflowInterceptor {
+
+	@XConnection(dynamic=true)
+	def dyna_xconn;
+	
+	@ActiveDB('online_bpls_renewal_builder')
+	def app_builder; 
+
+	@DataContext('online_business_application')
+	def online_app; 
+
+	@Service 
+	def self; 
+
+	@After( pattern="BusinessApplicationWorkflowService.notifyChangeAppState") 
+	public void afterNotifyChangeAppState( evt ) {
+		def param = evt.args[0]; 
+
+		def app = app_builder.findBusinessApp([ objid: param.objid ]); 
+		if ( !app ) return; 
+
+		if ( app.state == 'PAYMENT' ) {
+			def data = [:]; 
+			data.to = app.email; 
+			data.subject = 'Online Business Renewal For Payment'; 
+			
+			data.message = """ 
+				Your online business renewal application <b>${app.approvedappno}</b> has been approved. <br/> 
+				To make payment, go to 
+				<a href="http://192.168.1.9/partner/bohol_tagbilaran/bpls/businessbilling">
+					Filipizen.com
+				</a>.
+			""".toString(); 
+
+			self.sendMail( data ); 			
+		}
+		else if ( app.state == 'COMPLETED' ) {
+			//SEND EMAIL
+		}
+	}
+
+	@Async
+	@ProxyMethod(local=true)
+	public void sendMail( data ) { 
+		def mailConn = dyna_xconn.lookup('primary-email-server'); 
+		mailConn.send( data ); 
+	}	
+}
