@@ -68,6 +68,7 @@ const InitialPage = ({
   };
 
   const validateBin = () => {
+    setError(null);
     setLoading(true);
     appService.invoke("validateBin", app, (err, validatedApp) => {
       if (!err) {
@@ -90,6 +91,7 @@ const InitialPage = ({
   };
 
   const verifyApplication = () => {
+    setError(null);
     setLoading(true);
     appService.invoke("openBin", app, (err, validatedApp) => {
       if (!err) {
@@ -140,7 +142,7 @@ const InitialPage = ({
           <Subtitle>{step.caption}</Subtitle>
           <Spacer />
           <Error msg={error} />
-          <Text caption="Enter BIN" name="bin" required={true} />
+          <Text caption="Enter BIN" name="bin" required={true} autoFocus={true} />
           <ActionBar>
             <BackLink caption="Cancel" action={() => history.goBack()} />
             <Button caption="Next" action={validateBin} loading={loading} disableWhen={!app.bin} />

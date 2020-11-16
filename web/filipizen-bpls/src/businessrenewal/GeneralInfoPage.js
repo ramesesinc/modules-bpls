@@ -12,6 +12,7 @@ import {
   Label,
   Text,
   Subtitle,
+  Subtitle2,
   useData,
 } from "rsi-react-web-components";
 import "rsi-react-web-components/dist/index.css";
@@ -51,6 +52,7 @@ const GeneralInfoPage = ({
       <Error msg={error}/>
       <FormPanel context={app} handler={setApp}>
         <Title>{title}</Title>
+        <Subtitle2>Tracking No. {app.controlno}</Subtitle2>
         <Subtitle>General Information</Subtitle>
         <Spacer height={30} />
         <Panel row>
@@ -70,7 +72,7 @@ const GeneralInfoPage = ({
         )}
         <Spacer />
         <LobList lobs={app.lobs} isPreviousInfo={false}  />
-        <ActionBar visibleWhen={!stepCompleted}>
+        <ActionBar>
           <BackLink caption="Back" action={movePrevStep} />
           <Button caption="Next" action={moveNextStep} />
         </ActionBar>

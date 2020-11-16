@@ -11,6 +11,7 @@ import {
   Title,
   Text,
   Subtitle,
+  Subtitle2,
   useData,
 } from "rsi-react-web-components";
 
@@ -65,6 +66,7 @@ const EditInfoPage = ({
       <Error msg={error}/>
       <FormPanel context={app} handler={setApp}>
         <Title>{title}</Title>
+        <Subtitle2>Tracking No. {app.controlno}</Subtitle2>
         <Subtitle>Edit Information</Subtitle>
         <Spacer height={30} />
         <Panel row>
@@ -101,8 +103,8 @@ const EditInfoPage = ({
             caption={lob.lob.name}
           />
         )}
-        <ActionBar visibleWhen={!stepCompleted}>
-          <BackLink caption="Back" action={() => setCurrentStep(1)} />
+        <ActionBar>
+          <BackLink caption="Back" action={movePrevStep} />
           <Button caption="Next" action={submitInfo} />
         </ActionBar>
       </FormPanel>

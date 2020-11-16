@@ -12,6 +12,7 @@ import {
   Label,
   Text,
   Subtitle,
+  Subtitle2,
   useData,
 } from "rsi-react-web-components";
 import "rsi-react-web-components/dist/index.css";
@@ -47,7 +48,7 @@ const ConfirmPage = ({
   }, [])
 
   const submit = () => {
-    const submittedApp = { objid: app.objid, step: app.step + 1}
+    const submittedApp = { objid: app.objid, step: 2}
     appService.invoke("submit", submittedApp, (err, app) => {
       if (!err) {
         moveNextStep();
@@ -62,6 +63,7 @@ const ConfirmPage = ({
       <Error msg={error}/>
       <FormPanel context={app} handler={setApp}>
         <Title>{title}</Title>
+        <Subtitle2>Tracking No. {app.controlno}</Subtitle2>
         <Subtitle>Confirmation</Subtitle>
         <Spacer height={30} />
         <Panel row>
@@ -81,7 +83,7 @@ const ConfirmPage = ({
         )}
         <Spacer />
         <LobList lobs={app.lobs} isPreviousInfo={false}  />
-        <ActionBar visibleWhen={!stepCompleted}>
+        <ActionBar>
           <BackLink caption="Back" action={movePrevStep} />
           <Button caption="Submit" action={submit} />
         </ActionBar>

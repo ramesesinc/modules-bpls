@@ -71,6 +71,7 @@ const SelectTxnTypePage = ({
         error={error}
         helperText={error}
         size="small"
+        autoFocus={true} 
         />
       <ActionBar>
         <BackLink caption="Cancel" action={() => history.goBack()} />

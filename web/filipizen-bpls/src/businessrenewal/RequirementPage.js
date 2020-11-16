@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from "react";
 import {
   Card,
-  Panel,
   Error,
   Button,
   ActionBar,
   BackLink,
   Title,
-  Label,
   Subtitle,
+  Subtitle2,
   useData,
-  UploadButton
 } from "rsi-react-web-components";
 
 import { ACTIONS } from "./reducer";
@@ -35,6 +33,7 @@ const RequirementPage = ({
     setLoading(true);
     appService.invoke("getRequirements", app, (err, requirements) => {
       if (!err) {
+        requirements.forEach(req => req.attachment = {});
         dispatch({type: ACTIONS.SET_APP, app: {...app, step: 4}});
         setRequirements(requirements);
       } else {
@@ -88,6 +87,7 @@ const RequirementPage = ({
     <Card>
       <Error msg={error}/>
       <Title>{title}</Title>
+      <Subtitle2>Tracking No. {app.controlno}</Subtitle2>
       <Subtitle>Requirements</Subtitle>
       <h4>Please attach the following documents:</h4>
       <RequirementList 
@@ -95,7 +95,7 @@ const RequirementPage = ({
         onUpload={onUpload}
         deleteRequirement={deleteRequirement} 
       />
-      <ActionBar visibleWhen={!stepCompleted}>
+      <ActionBar>
         <BackLink caption="Back" action={movePrevStep} />
         <Button caption="Next" action={submit} disableWhen={!requirementsCompleted} />
       </ActionBar>

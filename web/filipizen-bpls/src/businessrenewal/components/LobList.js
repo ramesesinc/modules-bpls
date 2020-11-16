@@ -16,7 +16,7 @@ const LobList = ({
         <TableColumn caption="Line of Business" expr="lob.name" />
         <TableColumn
           caption={isPreviousInfo ? "Previous Gross (Php)" : "Gross (Php)"}
-          expr={(item) => currencyFormat(item.prevgross)}
+          expr={(item) => currencyFormat((isPreviousInfo ? item.prevgross : item.gross))}
           type="decimal"
           align="right"
         />
