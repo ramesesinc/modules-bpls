@@ -1,0 +1,10 @@
+<workunit>
+    <invokers>
+        <invoker type="business_application:section:extActions" 
+                 caption="View Options" action="open" target="popup"/>
+    </invokers> 
+    <code class="com.rameses.gov.etracs.bpls.models.BusinessApplicationOptionModel" /> 
+    <pages>
+        <page template="com.rameses.gov.etracs.bpls.views.BusinessApplicationOptionPage"/> 
+    </pages>
+</workunit> 
