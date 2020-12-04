@@ -1,0 +1,24 @@
+<workunit schemaName="vw_online_business_application" 
+          allowCreate="false" allowEdit="false" 
+          allowDelete="false" allowViewReport="false">
+     
+    <invokers>
+        <invoker type="vw_online_business_application:open" 
+                 caption="Online Business Application" 
+                 action="open" target="window"
+                 formId="#{entity.controlno}"
+                 formTitle="Online Business Application - #{entity.bin}" 
+                 windowTitle="#{entity.controlno}" /> 
+        
+        <invoker type="formActions" 
+                 caption="Approve for Processing" action="approve"  
+                 visibleWhen="#{entity.state == 'OPEN'}" 
+                 depends="formActions" />
+    </invokers>
+   
+    <code class="bpls.online.models.OnlineBusinessApplicationModel" />
+   
+    <pages>
+        <page template="bpls.online.views.OnlineBusinessApplicationPage" />
+    </pages>        
+</workunit>

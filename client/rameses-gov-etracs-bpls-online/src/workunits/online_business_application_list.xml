@@ -1,0 +1,14 @@
+<workunit extends="com/rameses/seti2/templates/CrudNodeList.xml" 
+          schemaName="vw_online_business_application" 
+          allowDelete="false" allowCreate="false">
+    
+  <invokers>
+     <invoker folderid="menucategory/online_bpls/txn" 
+              action="init" caption="Online Applications" 
+              formTitle="Online Business Applications" 
+              role="ONLINE_DATA_APPROVER" 
+              cols="bin,tradename,businessname,address.text,owner.name,appyear,apptype,appdate,controlno" /> 
+  </invokers> 
+  
+  <code class="bpls.online.models.OnlineBusinessApplicationListModel" />
+</workunit>

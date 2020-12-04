@@ -1,0 +1,8 @@
+<folders>
+    <folder id="menucategory">
+        <folder id="online_bpls" caption="Online Business">
+            <folder id="txn" caption="Transactions" index="0" icon="home/icons/folder.png"/>
+            <folder id="setting" caption="Settings" index="0" icon="home/icons/folder.png"/>
+        </folder>    
+    </folder>
+</folders>

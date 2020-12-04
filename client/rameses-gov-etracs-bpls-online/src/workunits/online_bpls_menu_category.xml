@@ -1,0 +1,13 @@
+<workunit extends="com/rameses/menu/templates/FXMenuCategory.xml" 
+          context="online_bpls">
+
+    <invokers>
+        <invoker type="home.action" 
+                 action="init" caption="Online Business" 
+                 notificationid="online_bpls" 
+                 role="ONLINE_DATA_APPROVER" index="100" 
+                 icon="home/icons/business.png" />
+    </invokers> 
+    
+    <code class="bpls.online.models.BplsMenuCategoryModel" />
+</workunit>
