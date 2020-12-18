@@ -87,7 +87,7 @@ const RequirementPage = ({
     <Card>
       <Error msg={error}/>
       <Title>{title}</Title>
-      <Subtitle2>Tracking No. {app.controlno}</Subtitle2>
+      <Subtitle2>{`Tracking No. ${app.controlno}`}</Subtitle2>
       <Subtitle>Requirements</Subtitle>
       <h4>Please attach the following documents:</h4>
       <RequirementList 

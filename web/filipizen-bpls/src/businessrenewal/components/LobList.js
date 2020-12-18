@@ -13,7 +13,7 @@ const LobList = ({
   return (
     <React.Fragment>
       <Table items={lobs} showPagination={false}>
-        <TableColumn caption="Line of Business" expr="lob.name" />
+        <TableColumn caption="Line of Business" width={400} expr="lob.name" />
         <TableColumn
           caption={isPreviousInfo ? "Previous Gross (Php)" : "Gross (Php)"}
           expr={(item) => currencyFormat((isPreviousInfo ? item.prevgross : item.gross))}

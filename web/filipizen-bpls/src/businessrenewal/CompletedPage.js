@@ -31,7 +31,7 @@ const CompletedPage = ({
     <Card>
       <Panel>
         <Title>{title}</Title>
-        <Subtitle2>Tracking No. {app.controlno}</Subtitle2>
+        <Subtitle2>{`Tracking No. ${app.controlno}`}</Subtitle2>
         <Subtitle>Application Completed</Subtitle>
         <Spacer height={30} />
         <p>

@@ -6,7 +6,6 @@ import {
   Error,
   Button,
   ActionBar,
-  BackLink,
   Spacer,
   Title,
   Label,
@@ -22,10 +21,8 @@ import LobList from "./components/LobList";
 
 const GeneralInfoPage = ({
   moveNextStep,
-  movePrevStep,
   appService, 
   title,
-  stepCompleted
 }) => {
 
   const [ctx, dispatch] = useData();
@@ -57,26 +54,26 @@ const GeneralInfoPage = ({
         <Spacer height={30} />
         <Panel row>
           <Text caption="BIN" name="bin" readOnly={true} />
-          <Text caption="Application No." name="prevapp.appno" readOnly={true} />
+          <Text caption="Application No." name="controlno" readOnly={true} />
         </Panel>
         <Panel row>
-          <Text caption="Application Year" name="prevapp.appyear" readOnly={true} />
-          <Text caption="Application Type" name="prevapp.apptype" readOnly={true} />
+          <Text caption="Application Year" name="appyear" readOnly={true} />
+          <Text caption="Application Type" name="apptype" readOnly={true} />
         </Panel>
         <Text caption="Trade Name" name="tradename" readOnly={true} />
         <Text caption="Owner Name" name="owner.name" readOnly={true} />
         <Text caption="Business Address" name="businessaddress" readOnly={true} />
         <Spacer />
         {app.infos.map(info => 
-          <Label key={info.name} caption={info.caption} >{info.value}</Label>
+          <Label key={info.name} caption={info.caption} captionStyle={{width: 350}}>{info.value}</Label>
         )}
         <Spacer />
         <LobList lobs={app.lobs} isPreviousInfo={false}  />
         <ActionBar>
-          <BackLink caption="Back" action={movePrevStep} />
           <Button caption="Next" action={moveNextStep} />
         </ActionBar>
       </FormPanel>
+      <pre>{JSON.stringify(app, null, 2)}</pre>
     </Card>
   );
 };

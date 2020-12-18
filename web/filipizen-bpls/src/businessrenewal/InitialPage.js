@@ -26,6 +26,7 @@ import TrackingInfo from "../components/TrackingInfo";
 import LobList from "./components/LobList";
 
 const steps = [
+  { name: "contact", caption: "Contact Information" },
   { name: "enter-bin", caption: "Business Identification Number" },
   { name: "email-verification", caption: "Email Verification" },
   { name: "app-notice", caption: "Business Renewal Notice" },
@@ -70,7 +71,7 @@ const InitialPage = ({
   const validateBin = () => {
     setError(null);
     setLoading(true);
-    appService.invoke("validateBin", app, (err, validatedApp) => {
+    appService.invoke("validateBin", { ...app, contact}, (err, validatedApp) => {
       if (!err) {
         setApp(validatedApp);
         moveNextStep()
@@ -126,12 +127,15 @@ const InitialPage = ({
 
   return (
     <React.Fragment>
-    {step.name === "verification" ? (
+    {step.name === "contact" ? (
       <ContactVerification
         partner={partner}
+        showName={true}
         moveNextStep={moveNextStep}
         movePrevStep={movePrevStep}
         title={title}
+        subtitle="Contact Verification"
+        emailRequired={true}
       />
     ): (
       <Card>
@@ -155,7 +159,7 @@ const InitialPage = ({
           <Spacer />
           <Content center>
             <span>Enter the code sent to your business email</span>
-            <span>address at {email}</span>
+            <span>address at {contact.email}</span>
           </Content>
           <Spacer />
           <Text
@@ -169,13 +173,8 @@ const InitialPage = ({
             error={error ? true : false}
             helperText={error}
           />
-          {/* 
-            <div style={{display: "flex", flexDirection: "row", justifyContent: "flex-end"}}>
-              <Button label="Resend Code" action={()=>setIsResendCode(true)} variant="text" />
-            </div>
-          */}
           <ActionBar>
-            <Button label="Verify" action={verifyCode} />
+            <Button label="Verify" action={verifyCode} loading={loading} disableWhen={loading} />
           </ActionBar>
         </Panel>
 
@@ -201,7 +200,7 @@ const InitialPage = ({
           </p>
 
           <Table items={app.redflags} showPagination={false}>
-            <TableColumn caption="Issue" expr="issue" />
+            <TableColumn caption="Issue" width={300} expr="issue" />
             <TableColumn caption="Office/Department" expr="office" />
           </Table>
 
