@@ -37,43 +37,44 @@ public class BusinessRecurringFeePage extends javax.swing.JPanel {
         xTextField1 = new com.rameses.rcp.control.XTextField();
 
         com.rameses.rcp.control.border.XTitledBorder xTitledBorder1 = new com.rameses.rcp.control.border.XTitledBorder();
+        xTitledBorder1.setPadding(new java.awt.Insets(25, 10, 0, 10));
         xTitledBorder1.setTitle("General Information");
         formPanel1.setBorder(xTitledBorder1);
+        formPanel1.setCaptionVAlignment(com.rameses.rcp.constant.UIConstants.CENTER);
+        formPanel1.setCellspacing(5);
 
         xLookupField2.setCaption("Account");
-        xLookupField2.setCaptionWidth(100);
-        xLookupField2.setCellPadding(new java.awt.Insets(15, 10, 0, 0));
         xLookupField2.setExpression("#{entity.account.title}");
         xLookupField2.setHandler("business_billitem_txntype:lookup");
         xLookupField2.setName("entity.txntype"); // NOI18N
+        xLookupField2.setVisibleWhen("#{ mode == 'create' }");
+        xLookupField2.setCaptionWidth(100);
         xLookupField2.setPreferredSize(new java.awt.Dimension(0, 22));
         xLookupField2.setRequired(true);
-        xLookupField2.setVisibleWhen("#{ mode == 'create' }");
         formPanel1.add(xLookupField2);
 
-        xLabel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         xLabel1.setCaption("Account");
-        xLabel1.setCaptionWidth(100);
-        xLabel1.setCellPadding(new java.awt.Insets(15, 10, 0, 0));
         xLabel1.setExpression("#{ entity.account.title }");
-        xLabel1.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        xLabel1.setPreferredSize(new java.awt.Dimension(0, 18));
         xLabel1.setVisibleWhen("#{ mode == 'edit' }");
+        com.rameses.rcp.control.border.XLineBorder xLineBorder1 = new com.rameses.rcp.control.border.XLineBorder();
+        xLineBorder1.setLineColor(new java.awt.Color(180, 180, 180));
+        xLabel1.setBorder(xLineBorder1);
+        xLabel1.setCaptionWidth(100);
+        xLabel1.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        xLabel1.setPreferredSize(new java.awt.Dimension(0, 22));
         formPanel1.add(xLabel1);
 
         xDecimalField1.setCaption("Amount");
-        xDecimalField1.setCaptionWidth(100);
-        xDecimalField1.setCellPadding(new java.awt.Insets(5, 10, 0, 0));
         xDecimalField1.setName("entity.amount"); // NOI18N
-        xDecimalField1.setPreferredSize(new java.awt.Dimension(150, 20));
+        xDecimalField1.setCaptionWidth(100);
+        xDecimalField1.setPreferredSize(new java.awt.Dimension(150, 22));
         xDecimalField1.setRequired(true);
         formPanel1.add(xDecimalField1);
 
         xTextField1.setCaption("Remarks");
         xTextField1.setName("entity.remarks"); // NOI18N
         xTextField1.setCaptionWidth(100);
-        xTextField1.setCellPadding(new java.awt.Insets(5, 10, 0, 0));
-        xTextField1.setPreferredSize(new java.awt.Dimension(0, 20));
+        xTextField1.setPreferredSize(new java.awt.Dimension(0, 22));
         formPanel1.add(xTextField1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -82,15 +83,15 @@ public class BusinessRecurringFeePage extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(formPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE)
+                .addComponent(formPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 562, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(formPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(52, Short.MAX_VALUE))
+                .addComponent(formPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 215, Short.MAX_VALUE)
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables

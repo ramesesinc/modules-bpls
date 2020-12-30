@@ -1,0 +1,6 @@
+<workunit extends="wtemplates/RuleMgmtController.xml" serviceName="RuleMgmtService">
+    <invokers>
+        <invoker folderid="/explorer/rulemgmt/bpls" caption="Fire Assessment Rules" 
+                 action="init" index="10" role="RULE_AUTHOR" tag="firebpassessment"/>
+    </invokers>
+</workunit>

@@ -34,19 +34,15 @@
                 m.onselect = { o->
                     entity.putAll( o );
                     pass = true;
-                };
+                }
                 Modal.show( Inv.lookupOpener( "cashreceipt:business:lookup", m ) );
-                if(!pass) {
-                    super.doClose();
-                }
-                else {
-                    //load apps
-                    def app = [applicationid:entity.applicationid];
-                    def z = cashRctSvc.findInfo( app );
-                    entity.putAll(z); 
-                    loadBilling( entity );
-                    binding?.refresh();
-                }
+                if(!pass) throw new BreakException();
+                
+                //load apps
+                def app = [applicationid:entity.applicationid];
+                def z = cashRctSvc.findInfo( app );
+                entity.putAll(z); 
+                loadBilling( entity );
             }
             
             void loadBarcode() {
@@ -54,7 +50,6 @@
                 def m = cashRctSvc.findInfo( app );
                 entity.putAll(m); 
                 loadBilling( entity );
-                binding?.refresh();
             }          
             
             def loadBilling = { m ->

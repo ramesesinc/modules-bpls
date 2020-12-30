@@ -68,12 +68,12 @@ class OnlineBusinessRenewalService {
 		def business = online_bpls_renewal.findBIN([ bin: bin ]); 
 		if ( !business ) throw new Exception('BIN '+ bin +' does not exist'); 
 
-		if ( !business.email ) {
-			def msg = new StringBuilder(); 
-			msg.append('This business account does not have a registered email address. ');
-			msg.append('\n').append( contact_support_msg ); 
-			throw new Exception( msg.toString()); 
-		} 
+//		if ( !business.email ) {
+//			def msg = new StringBuilder(); 
+//			msg.append('This business account does not have a registered email address. ');
+//			msg.append('\n').append( contact_support_msg ); 
+//			throw new Exception( msg.toString()); 
+//		} 
 		return business; 
 	} 
 
@@ -116,9 +116,15 @@ class OnlineBusinessRenewalService {
 		def str = (arrs.length > 1 ? arrs[1] : arrs[0]); 
 		def key = str.padLeft(6, '0').toString().substring(0, 6); 
 
-		def res = [bin: business.bin, email: business.email, key: key ];
+		def res = [ bin: business.bin, key: key ]; 
 		res.tokenid = createToken( res.bin, res.key ); 
-		println '\nvalidateBin -> '+ res; 
+
+		// merge result from openBin
+		res.putAll( openBin( res )); 
+
+		res.contact = param.contact; 
+		res.email = res.contact?.email;
+		res.mobileno = res.contact?.mobileno; 
 		return res; 
 	} 
 
@@ -223,10 +229,31 @@ class OnlineBusinessRenewalService {
   		if ( !param.orgcode ) throw new Exception('orgcode parameter is required'); 
 
   		if ( !param.prevapp?.objid ) throw new Exception('prevapp.objid parameter is required'); 
+  		if ( !param.prevapp?.appyear ) throw new Exception('prevapp.appyear parameter is required'); 
   		if ( !param.lobs ) throw new Exception('lobs parameter is required'); 
   		if ( !param.infos ) throw new Exception('infos parameter is required'); 
 
+  		if ( !param.contact?.email ) 
+			throw new Exception('contact.email  parameter is required'); 
+
+  		if ( !param.partner?.name ) 
+			throw new Exception('partner.name  parameter is required'); 
+  		if ( !param.partner?.group?.name ) 
+			throw new Exception('partner.group.name  parameter is required'); 
+
 		def akey = validateToken( param.businessid, param.tokenid ); 
+
+		def newappyear = param.prevapp.appyear + 1; 
+
+		def findstr = 'business.objid = :businessid AND appyear = :appyear'; 
+		def findmap = [businessid: param.businessid, appyear: newappyear]; 
+		def test = online_app.select('objid,controlno,state').where( findstr, findmap ).first(); 
+		if ( test ) { 
+			def errmsg = new StringBuilder(); 
+			errmsg.append("Business renewal has already been filed for the current year.");
+			errmsg.append('\n').append( contact_support_msg ); 
+			throw new Exception( errmsg.toString() );  
+		}
 
   		def business = online_bpls_renewal.findBusiness([ objid: param.businessid ]); 
   		if ( !business ) throw new Exception("Business account "+ param.bin +" cannot be found"); 
@@ -235,7 +262,7 @@ class OnlineBusinessRenewalService {
   		newapp.dtcreated = dateSvc.getServerDate(); 
   		newapp.prevapplicationid = param.prevapp.objid; 
   		newapp.business = [objid: param.businessid]; 
-  		newapp.appyear = param.prevapp.appyear + 1; 
+  		newapp.appyear = newappyear; 
   		newapp.appdate = newapp.dtcreated; 
   		newapp.step = (param.step ? param.step : 0);
   		newapp.apptype = 'RENEW'; 
@@ -248,6 +275,8 @@ class OnlineBusinessRenewalService {
 		newapp.requirements = []; 
 		newapp.lobs = param.lobs; 
 		newapp.infos = param.infos; 
+		newapp.contact = param.contact; 
+		newapp.partnername = [ param.partner.group.name, param.partner.name ].join('_'); 
 		newapp.controlno = KeyGen.generateAlphanumKey( 'B-'+ param.orgcode +'-', 12 ); 
 		online_app.create( newapp ); 
 

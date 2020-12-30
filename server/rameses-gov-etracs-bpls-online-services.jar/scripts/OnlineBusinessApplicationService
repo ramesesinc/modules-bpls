@@ -27,6 +27,7 @@ class OnlineBusinessApplicationService {
 
 	@Service('DateService') 
 	def dateSvc; 
+	
 
 	@ProxyMethod 
 	public def approve( param ) {
@@ -148,18 +149,10 @@ class OnlineBusinessApplicationService {
 			reqinfo.clear(); 
 		} 
 
-		def taskinfo = [:]; 
-		taskinfo.objid = 'TSK'+ new UID().toString(); 
-		taskinfo.refid = app.objid; 
-		taskinfo.state = 'assign-assessor'; 
-		taskinfo.startdate = rundate; 
-
-		app_task.create( taskinfo ); 
-		taskinfo.clear(); 
-
 		uu.objid = app.objid; 
-		uu.email = bus.email; 
-		return uu; 
+		uu.contact = app.contact; 
+		uu.data = app_builder.findBusinessApp([ objid: app.objid ]); 
+		return uu; 		
 	} 
 
     def toInteger( value ) {
@@ -179,10 +172,11 @@ class OnlineBusinessApplicationService {
         def tcount = (mcount ? mcount : 0) + (fcount ? fcount : 0); 
         def ai = activeinfos.find{( it.attribute?.objid == 'NUM_EMPLOYEE')} 
         if ( !ai ) {
-        	activeinfos << [ 
+        	ai = [ 
         		type: 'appinfo', phase: 1, level: 0, intvalue: 0, 
         		attribute: [objid: 'NUM_EMPLOYEE', name: 'NUM_EMPLOYEE'] 
         	]; 
+        	activeinfos << ai; 
         } 
         ai.intvalue = tcount; 
     } 

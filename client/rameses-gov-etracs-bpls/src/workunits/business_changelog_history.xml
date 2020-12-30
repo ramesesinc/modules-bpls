@@ -21,6 +21,8 @@
             boolean allowOpen = false;
             boolean allowCreate = false;
             boolean allowClose = false;
+            boolean allowSearch = false;
+            
             def entity;
             def queryForm = null;
             

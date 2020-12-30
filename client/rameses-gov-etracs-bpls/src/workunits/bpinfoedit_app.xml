@@ -1,29 +1,28 @@
 <workunit>
     
     <invokers>
-        <invoker type="bpinfoedit:app" 
-                 formTitle="Edit Business Info"
-                 caption="Edit Business Info" 
-                 action="start" target="popup"/>
+        <invoker type="bpinfoedit:app" caption="Edit Business Info" action="start" target="popup"/>
     </invokers>
     
     <code>
     <![CDATA[    
-    import com.rameses.rcp.annotations.*
-    import com.rameses.rcp.common.*
-    import com.rameses.osiris2.client.*
-    import com.rameses.osiris2.common.*
-    import com.rameses.gov.etracs.bpls.models.*;
+import com.rameses.rcp.annotations.*
+import com.rameses.rcp.common.*
+import com.rameses.osiris2.client.*
+import com.rameses.osiris2.common.*
+import java.rmi.server.*;
 
-    public class BPEditInfoController extends AbstractBusinessInfoModel {
+public class BPEditInfoController extends com.rameses.gov.etracs.bpls.models.BusinessInfoEdit {
 
-        @Service("BPInfoRuleService")
-        def service;
+    @Service("BPInfoRuleService")
+    def service;
 
-        public def execute() {
-            return service.execute(query);
-        }
+    String title = "Edit Business Info";
+
+    public def execute() {
+        return service.execute(query);
     }
+}
     ]]> 
     </code>
     

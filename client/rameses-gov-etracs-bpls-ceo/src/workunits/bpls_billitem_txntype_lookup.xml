@@ -1,4 +1,6 @@
-<workunit extends="com/rameses/seti2/templates/CrudLookup.xml" schemaName="business_billitem_txntype">
+<workunit extends="com/rameses/seti2/templates/CrudLookup.xml" 
+          schemaName="business_billitem_txntype"
+          allowCreate="false" allowDelete="false">
     <invokers>
           <invoker type="business_billitem_txntype:lookup" 
                    action="init" caption="Business BillItem Txntype"  

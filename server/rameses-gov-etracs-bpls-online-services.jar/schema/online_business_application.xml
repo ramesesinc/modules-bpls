@@ -21,5 +21,12 @@
 		<field name="approvedby_objid" /> 
 		<field name="approvedby_name" /> 
 		<field name="approvedappno" /> 
+
+		<field name="contact_name" required="true"/> 
+		<field name="contact_address" required="true"/> 
+		<field name="contact_email" required="true"/> 
+		<field name="contact_mobileno" /> 
+
+		<field name="partnername" required="true"/> 
 	</element> 
 </schema> 

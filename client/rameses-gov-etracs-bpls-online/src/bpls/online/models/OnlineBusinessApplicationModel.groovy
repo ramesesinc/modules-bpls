@@ -26,7 +26,7 @@ class OnlineBusinessApplicationModel extends CrudFormModel {
         
         if ( entity.requirements ) {
             entity.requirements.each{
-                it.hasattachment = ( it.attachment?.path ? true : false );
+                it.hasattachment = ( it.attachment?.location ? true : false );
             }
         }
         
@@ -66,7 +66,7 @@ class OnlineBusinessApplicationModel extends CrudFormModel {
 
     
     boolean isWithAttachment() {
-        return (selectedRequirement?.attachment?.path ? true : false); 
+        return (selectedRequirement?.attachment?.location ? true : false); 
     }
   
     void downloadAttachment() {
