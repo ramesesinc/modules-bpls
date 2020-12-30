@@ -20,7 +20,7 @@ import ConfirmPage from "./ConfirmPage";
 import CompletedPage from "./CompletedPage";
 
 const pages = [
-  { step: 0, name: "select", caption: "Initial", component: SelectTxnTypePage },
+  { step: 0, name: "select", caption: "Select Application Type", component: SelectTxnTypePage },
   { step: 1, name: "initial", caption: "Initial", component: InitialPage },
   { step: 2, name: "info", caption: "General Information", component: GeneralInfoPage },
   { step: 3, name: "edit-info", caption: "Edit Information", component: EditInfoPage },
@@ -39,7 +39,7 @@ const RenewBusinessWebController = ({
 
   const [step, setStep] = useState(initialStep);
   const [app, setApp] = useState({step: 0});
-
+  
   const moveNextStep = (nextStep) => {
     if (typeof(nextStep) === "number") {
       setStep(nextStep);
@@ -59,7 +59,8 @@ const RenewBusinessWebController = ({
   }
 
   const handleStep = (step) => {
-    setStep(step + 2);
+    const actualStep = step + 2;
+    setStep(actualStep);
   };
 
    const page = pages[step];
@@ -80,7 +81,6 @@ const RenewBusinessWebController = ({
   return (
     <StateProvider initialState={initialState} reducer={reducer}>
       <Page>
-        {/** {step > 0 && app.step < pages.length && ( */}
         {step > 1 && (
           <Panel target="left" style={styles.stepperContainer}>
             <Stepper

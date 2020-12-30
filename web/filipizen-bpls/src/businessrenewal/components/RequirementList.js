@@ -21,6 +21,7 @@ const RequirementList = ({ requirements, deleteRequirement, onUpload }) => {
   return (
     <div className={styles.container}>
       <div className={styles.list}>
+        <h4 style={{paddingLeft: 20}}>Documents</h4>
         {requirements.map((req, idx) => {
           const classNames = selectedIndex === idx ? `${styles.listItem} ${styles.selected}` : styles.listItem;
           return (

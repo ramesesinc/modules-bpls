@@ -2,6 +2,7 @@ import React from "react";
 import {
   Card,
   Subtitle,
+  Subtitle2,
   Panel,
   Button,
   ActionBar,
@@ -30,6 +31,7 @@ const CompletedPage = ({
     <Card>
       <Panel>
         <Title>{title}</Title>
+        <Subtitle2>{`Tracking No. ${app.controlno}`}</Subtitle2>
         <Subtitle>Application Completed</Subtitle>
         <Spacer height={30} />
         <p>

@@ -42,7 +42,7 @@ const SelectTxnTypePage = ({
             app.infos = [];
             app.lobs = [];
             dispatch({type: ACTIONS.SET_APP, app});
-            moveNextStep(app.step);
+            moveNextStep(app.step+1);
           } else  {
             setError(err);
           }
@@ -71,6 +71,7 @@ const SelectTxnTypePage = ({
         error={error}
         helperText={error}
         size="small"
+        autoFocus={true} 
         />
       <ActionBar>
         <BackLink caption="Cancel" action={() => history.goBack()} />

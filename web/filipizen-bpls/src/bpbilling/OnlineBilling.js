@@ -92,7 +92,7 @@ const OnlineBilling = ({
     onCancel(0);
   }
 
-  const blur = contact && contact.email !== bill.email;
+  const visible = contact && contact.email === bill.email;
 
   return (
     <Card style={{maxWidth: 800}}>
@@ -105,9 +105,9 @@ const OnlineBilling = ({
         <Label context={bill} caption="Application Type" expr="apptype" />
         <Label context={bill} caption="Date Filed" expr="appdate" />
         <Label context={bill} caption="BIN" expr="bin" />
-        <Label context={bill} caption="Trade Name" expr="tradename" blur={blur} />
-        <Label context={bill} caption="Owner Name" expr="ownername" blur={blur} />
-        <Label context={bill} caption="Business Address" expr="address" blur={blur} />
+        <Label context={bill} caption="Trade Name" expr="tradename" visibleWhen={visible} />
+        <Label context={bill} caption="Owner Name" expr="ownername" visibleWhen={visible} />
+        <Label context={bill} caption="Business Address" expr="address" visibleWhen={visible} />
         <Spacer />
         <Panel style={{display: "flex", justifyContent: "flex-start"}}>
           <Button variant="outlined" caption='Pay Option' action={() => setShowPayOption(true)} />
