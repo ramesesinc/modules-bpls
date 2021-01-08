@@ -63,9 +63,14 @@ public abstract class BusinessInfoEdit extends PageFlowController {
                 }
             }
         }
-        list = list + sinfos.findAll{ it.lob?.objid!=null }?.sort{ [it.lob.name, it.attribute.sortorder] }; 
-        return list; 
-    }
+
+        def infolist = sinfos.findAll{( it.lob?.objid )} 
+        infolist.each{
+            println "> "+ (it.lob.name.toString() +"-"+ (it.attribute?.sortorder ? it.attribute?.sortorder : 0).toString()); 
+        }
+        infolist.sort{( it.lob.name.toString() +"-"+ (it.attribute?.sortorder ? it.attribute?.sortorder : 0).toString() )} 
+        return (list + infolist); 
+    } 
 
     def findValue( info ) {
         if(info.lob?.objid!=null) {

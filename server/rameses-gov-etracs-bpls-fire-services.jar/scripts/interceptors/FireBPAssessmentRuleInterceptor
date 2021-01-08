@@ -43,9 +43,12 @@ class FireBPAssessmentRuleInterceptor {
 			bt.name = tf.account?.title;
 			bt.amount = tf.amount;
 			bt.type = tf.taxfeetype;
-			bt.assessedvalue = tf.assessedvalue;
 			bt.highest = false;
 			bt.lowest = false;
+
+			if ( tf.assessedvalue ) {
+				bt.assessedvalue = tf.assessedvalue;
+			}
 			bt.flag = tf.flag;
 			bt.tag = tf.tag; 
 			bt.data = tf;

@@ -56,20 +56,25 @@ public class OnlineBusinessApplicationPage extends javax.swing.JPanel {
         xButton1 = new com.rameses.rcp.control.XButton();
         xButton2 = new com.rameses.rcp.control.XButton();
         xDataTable3 = new com.rameses.rcp.control.XDataTable();
+        jPanel8 = new javax.swing.JPanel();
+        xFormPanel3 = new com.rameses.rcp.control.XFormPanel();
+        xLabel14 = new com.rameses.rcp.control.XLabel();
+        xLabel17 = new com.rameses.rcp.control.XLabel();
+        xLabel18 = new com.rameses.rcp.control.XLabel();
+        xLabel19 = new com.rameses.rcp.control.XLabel();
 
         setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        setPreferredSize(new java.awt.Dimension(815, 480));
+        setPreferredSize(new java.awt.Dimension(820, 600));
         setLayout(new java.awt.BorderLayout());
 
         jPanel1.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 5, 0));
-        com.rameses.rcp.control.layout.XLayout xLayout1 = new com.rameses.rcp.control.layout.XLayout();
-        xLayout1.setSpacing(5);
-        jPanel1.setLayout(xLayout1);
+        jPanel1.setLayout(new com.rameses.rcp.control.layout.XLayout());
 
         com.rameses.rcp.control.border.XTitledBorder xTitledBorder1 = new com.rameses.rcp.control.border.XTitledBorder();
         xTitledBorder1.setPadding(new java.awt.Insets(30, 15, 20, 15));
         xTitledBorder1.setTitle("   General Information    ");
         xFormPanel1.setBorder(xTitledBorder1);
+        xFormPanel1.setCaptionVAlignment(com.rameses.rcp.constant.UIConstants.CENTER);
         xFormPanel1.setCaptionWidth(110);
         xFormPanel1.setPreferredSize(new java.awt.Dimension(500, 195));
 
@@ -163,6 +168,7 @@ public class OnlineBusinessApplicationPage extends javax.swing.JPanel {
         xTitledBorder2.setPadding(new java.awt.Insets(30, 15, 20, 15));
         xTitledBorder2.setTitle("   Application Information    ");
         xFormPanel2.setBorder(xTitledBorder2);
+        xFormPanel2.setCaptionVAlignment(com.rameses.rcp.constant.UIConstants.CENTER);
         xFormPanel2.setCaptionWidth(100);
         xFormPanel2.setPreferredSize(new java.awt.Dimension(300, 160));
 
@@ -476,6 +482,78 @@ public class OnlineBusinessApplicationPage extends javax.swing.JPanel {
 
         xTabbedPane1.addTab("   Requirements       ", jPanel4);
 
+        xFormPanel3.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 0, 0));
+        xFormPanel3.setCaptionVAlignment(com.rameses.rcp.constant.UIConstants.CENTER);
+        xFormPanel3.setCaptionWidth(110);
+        xFormPanel3.setPreferredSize(new java.awt.Dimension(805, 110));
+
+        xLabel14.setCaption("Name");
+        xLabel14.setExpression("#{entity.contact.name}");
+        com.rameses.rcp.control.border.XLineBorder xLineBorder14 = new com.rameses.rcp.control.border.XLineBorder();
+        xLineBorder14.setHideLeft(true);
+        xLineBorder14.setHideRight(true);
+        xLineBorder14.setHideTop(true);
+        xLineBorder14.setLineColor(new java.awt.Color(180, 180, 180));
+        xLabel14.setBorder(xLineBorder14);
+        xLabel14.setPreferredSize(new java.awt.Dimension(0, 20));
+        xLabel14.setStretchWidth(100);
+        xFormPanel3.add(xLabel14);
+
+        xLabel17.setCaption("Address");
+        xLabel17.setExpression("#{entity.contact.address ? entity.contact.address.replace('\\\\n',' ') : ' '}");
+        com.rameses.rcp.control.border.XLineBorder xLineBorder15 = new com.rameses.rcp.control.border.XLineBorder();
+        xLineBorder15.setHideLeft(true);
+        xLineBorder15.setHideRight(true);
+        xLineBorder15.setHideTop(true);
+        xLineBorder15.setLineColor(new java.awt.Color(180, 180, 180));
+        xLabel17.setBorder(xLineBorder15);
+        xLabel17.setCellPadding(new java.awt.Insets(0, 0, 5, 0));
+        xLabel17.setPreferredSize(new java.awt.Dimension(0, 20));
+        xLabel17.setStretchWidth(100);
+        xFormPanel3.add(xLabel17);
+
+        xLabel18.setCaption("Email");
+        xLabel18.setExpression("#{entity.contact.email}");
+        com.rameses.rcp.control.border.XLineBorder xLineBorder16 = new com.rameses.rcp.control.border.XLineBorder();
+        xLineBorder16.setHideLeft(true);
+        xLineBorder16.setHideRight(true);
+        xLineBorder16.setHideTop(true);
+        xLineBorder16.setLineColor(new java.awt.Color(180, 180, 180));
+        xLabel18.setBorder(xLineBorder16);
+        xLabel18.setPreferredSize(new java.awt.Dimension(200, 20));
+        xLabel18.setStretchWidth(100);
+        xFormPanel3.add(xLabel18);
+
+        xLabel19.setCaption("Mobile No.");
+        xLabel19.setExpression("#{entity.contact.mobileno}");
+        com.rameses.rcp.control.border.XLineBorder xLineBorder17 = new com.rameses.rcp.control.border.XLineBorder();
+        xLineBorder17.setHideLeft(true);
+        xLineBorder17.setHideRight(true);
+        xLineBorder17.setHideTop(true);
+        xLineBorder17.setLineColor(new java.awt.Color(180, 180, 180));
+        xLabel19.setBorder(xLineBorder17);
+        xLabel19.setPreferredSize(new java.awt.Dimension(200, 20));
+        xFormPanel3.add(xLabel19);
+
+        javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
+        jPanel8.setLayout(jPanel8Layout);
+        jPanel8Layout.setHorizontalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel8Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(xFormPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 600, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(195, Short.MAX_VALUE))
+        );
+        jPanel8Layout.setVerticalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel8Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(xFormPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        xTabbedPane1.addTab("   Contact Information     ", jPanel8);
+
         add(xTabbedPane1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -484,6 +562,7 @@ public class OnlineBusinessApplicationPage extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel8;
     private com.rameses.rcp.control.XButton xButton1;
     private com.rameses.rcp.control.XButton xButton2;
     private com.rameses.rcp.control.XDataTable xDataTable1;
@@ -491,11 +570,16 @@ public class OnlineBusinessApplicationPage extends javax.swing.JPanel {
     private com.rameses.rcp.control.XDataTable xDataTable3;
     private com.rameses.rcp.control.XFormPanel xFormPanel1;
     private com.rameses.rcp.control.XFormPanel xFormPanel2;
+    private com.rameses.rcp.control.XFormPanel xFormPanel3;
     private com.rameses.rcp.control.XLabel xLabel1;
     private com.rameses.rcp.control.XLabel xLabel10;
     private com.rameses.rcp.control.XLabel xLabel11;
     private com.rameses.rcp.control.XLabel xLabel12;
     private com.rameses.rcp.control.XLabel xLabel13;
+    private com.rameses.rcp.control.XLabel xLabel14;
+    private com.rameses.rcp.control.XLabel xLabel17;
+    private com.rameses.rcp.control.XLabel xLabel18;
+    private com.rameses.rcp.control.XLabel xLabel19;
     private com.rameses.rcp.control.XLabel xLabel2;
     private com.rameses.rcp.control.XLabel xLabel3;
     private com.rameses.rcp.control.XLabel xLabel4;

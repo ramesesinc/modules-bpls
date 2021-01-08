@@ -31,7 +31,7 @@
         @FormTitle
         def title;
         
-        def txnTypes = [ "TAX", "REGFEE", "OTHER" ];
+        def txnTypes = [ "TAX", "REGFEE", "OTHERCHARGE" ];
         
         void create() {
             mode = 'create';
