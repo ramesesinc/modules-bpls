@@ -1,0 +1,16 @@
+<workunit>
+    <invokers>
+        <invoker type="business_closure_certificate" 
+                 caption="Print Closure Certificate" action="init" 
+                 role="LICENSING" permission="closure_certificate.print" 
+                 width="1024" height="768"/> 
+        
+        <invoker type="formActions" caption="Close" action="doClose" mnemonic="C"
+                 visibleWhen="#{mode=='view'}"/>
+    </invokers>
+    <code class="com.rameses.gov.etracs.bpls.models.BusinessClosureCertificateModel"/> 
+    <pages>
+        <page template="com.rameses.gov.etracs.bpls.views.ClosureCreatePage"/> 
+        <page name="report" template="com.rameses.osiris2.common.ui.ReportPreviewPage" />
+    </pages>
+</workunit>

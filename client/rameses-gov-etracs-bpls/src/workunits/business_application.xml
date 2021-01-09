@@ -17,6 +17,9 @@
         <invoker type="extActions" caption="Print Permit"  action="printPermit" 
                  visibleWhen="#{allowPrintPermit==true}" role="LICENSING" index="2" /> 
 
+        <invoker type="extActions" caption="Print Certificate"  action="printClosureCertificate" 
+                 visibleWhen="#{allowPrintClosureCertificate==true}" role="LICENSING" index="2" />
+
         <invoker type="extActions" caption="View Business" index="0" action="viewBusiness" />  
         
         <invoker type="extActions" caption="View Assessment" action="viewAssessment" 
