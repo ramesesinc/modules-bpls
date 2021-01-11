@@ -302,6 +302,8 @@ class  BusinessApplicationModel extends WorkflowController {
         def info = [:];
         info.trackingno = entity.barcode;
         info.message = "Present this when doing business transactions";
+        info.handler = 'business_application';
+        info.data = entity; 
         //Modal.show( "show_trackingno", [info: info] );
         def op = Inv.lookupOpener("show_trackingno", [info: info]);
         op.handle.print();
