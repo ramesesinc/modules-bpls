@@ -162,8 +162,9 @@ class  BusinessApplicationAssessmentController {
             return paymentSvc.getApplicationPayments([applicationid:entity.objid]);
         }, 
         onOpenItem: { o,col->
-            if( o.reftype == 'cashreceipt' ) {
-                def op = Inv.lookupOpener( "cashreceiptinfo:open", [entity:[objid: o.refid]] );
+            String reftype = o.reftype.toString().toLowerCase();
+            if ( reftype.matches('cashreceipt|eor')) {
+                def op = Inv.lookupOpener( reftype +":open", [entity: [objid: o.refid]]);
                 op.target = 'popup';
                 return op;
             }  

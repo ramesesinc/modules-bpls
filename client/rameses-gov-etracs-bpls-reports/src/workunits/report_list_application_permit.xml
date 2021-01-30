@@ -1,0 +1,9 @@
+<workunit extends="wtemplates/ReportController.xml" >
+    <invokers>
+        <invoker folderid="/explorer/report/bpls" 
+                 caption="Application Listing (By Permit Issuance)" action="init" 
+                 role="REPORT" target="window"/>
+    </invokers>
+    
+    <code class="com.rameses.gov.etracs.bpls.reports.models.ApplicationPermitListReportModel"/>
+</workunit>

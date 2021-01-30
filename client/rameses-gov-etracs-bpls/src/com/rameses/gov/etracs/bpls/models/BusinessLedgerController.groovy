@@ -135,8 +135,8 @@ class BusinessLedgerController {
         if ( !isCanViewPayment()) return null; 
 
         def reftype = selectedPayment.reftype.toString().toLowerCase(); 
-        if ( reftype == 'cashreceipt' ) {
-            def op = Inv.lookupOpener( "cashreceiptinfo:open", [entity: [ objid: selectedPayment.refid]]);
+        if ( reftype.matches('cashreceipt|eor')) { 
+            def op = Inv.lookupOpener( reftype +":open", [entity: [ objid: selectedPayment.refid ]]);
             op.target = 'popup';
             return op;
         } 
