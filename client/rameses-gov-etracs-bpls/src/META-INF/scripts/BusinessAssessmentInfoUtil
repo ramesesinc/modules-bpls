@@ -74,7 +74,9 @@ public class BusinessAssessmentInfoUtil {
         p.billdate = bd;
         p.taxfees = entity.taxfees;
         p.show_paid = show_paid;
-        p.app = [apptype:entity.apptype, appyear:entity.appyear, dtfiled:entity.dtfiled, appno:entity.appno];    
+        p.app = [apptype:entity.apptype, appyear:entity.appyear, dtfiled:entity.dtfiled, appno:entity.appno]; 
+        p.app.business = entity.business; 
+
         def result = billSvc.generateBilling( p );
         entity.taxfees = result.taxfees;
         entity.totals = result.totals;
