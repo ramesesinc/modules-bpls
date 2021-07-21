@@ -163,6 +163,15 @@ class BusinessPermitService  {
 
 		def varvalue = sysvar.getProperty( 'businesspermit_split_printing', null );  
 		boolean splitPrinting = ( "true" == varvalue.toString() ); 
+
+		def stateFilters = ['COMPLETED'];
+		varvalue = sysvar.getProperty( 'businesspermit_issuance_on_release', null );  
+		if ( varvalue.toString().matches('true|1')) {
+			stateFilters << 'RELEASE'; 
+		} 
+
+		o.statefilter = stateFilters.collect{"'"+ it +"'"}.join(", "); 
+
 		//
 		// when businesspermit_split_printing is set to true 
 		// the application lobs are not merge instead they are  
@@ -332,7 +341,16 @@ class BusinessPermitService  {
 		}
 		*/ 
 
-		def lobs = em.getBuildLobs([ permitid: perm.objid ]); 
+		def stateFilters = ['COMPLETED'];
+		def varvalue = sysvar.getProperty( 'businesspermit_issuance_on_release', null );  
+		if ( varvalue.toString().matches('true|1')) {
+			stateFilters << 'RELEASE'; 
+		} 
+
+		def qmap = [ permitid: perm.objid ]; 
+		qmap.statefilter = stateFilters.collect{"'"+ it +"'"}.join(", "); 
+
+		def lobs = em.getBuildLobs( qmap ); 
 		if ( !lobs ) throw new Exception('failed to build permit lobs'); 
 
 		permitlob_db.find([ parentid: perm.objid ]).delete(); 

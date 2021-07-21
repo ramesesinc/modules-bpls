@@ -119,10 +119,10 @@ select
 	b.orgtype  
 from ( 
 	select objid as appid from business_application 
-	where objid=$P{applicationid} and state='COMPLETED'  
+	where objid=$P{applicationid} and state in (${statefilter})
 	union 
 	select objid as appid from business_application 
-	where parentapplicationid=$P{applicationid} and state='COMPLETED'  
+	where parentapplicationid=$P{applicationid} and state in (${statefilter}) 
 )xx 
 	inner join business_application ba on ba.objid=xx.appid 
 	inner join business_permit bp on ba.objid=bp.applicationid 
@@ -207,7 +207,7 @@ from (
 			inner join lob on lob.objid = alob.lobid  
 		where bperm.objid = $P{permitid} 
 			and bac.txndate < ba.txndate 
-			and bac.state = 'COMPLETED' 
+			and bac.state in (${statefilter})
 
 		union all 
 
@@ -219,7 +219,7 @@ from (
 			inner join business_application_lob alob on alob.applicationid = ba.objid 
 			inner join lob on lob.objid = alob.lobid  
 		where bperm.objid = $P{permitid} 
-			and ba.state = 'COMPLETED' 
+			and ba.state in (${statefilter})
 
 	)t1 
 	group by t1.lobid, t1.name 
